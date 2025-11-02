@@ -2,31 +2,31 @@
   "placeholderImages": [
     {
       "id": "hero-dashboard",
-      "description": "A screenshot of the SourceMap application dashboard, showing analysis results.",
-      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYXNoYm9hcmQlMjBhbmFseXRpY3N8ZW58MHx8fHwxNzYyMDkwNjU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "A clean and modern UI screenshot of an application dashboard for document analysis.",
+      "imageUrl": "https://storage.googleapis.com/stabl-media/6979a04a-c07a-4b95-ad17-293b134d193d/hero-dashboard-image.jpeg",
       "imageHint": "dashboard screenshot"
     },
     {
       "id": "how-it-works-upload",
-      "description": "An illustration or screenshot of the document upload interface.",
+      "description": "A minimalist graphic illustrating the first step of a process: 'Upload Document'.",
       "imageUrl": "https://images.unsplash.com/photo-1574933902973-581de6a24f0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWxlJTIwdXBsb2FkJTIwaW50ZXJmYWNlfGVufDB8fHx8MTc2MjA5MDY1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "upload interface"
     },
     {
       "id": "how-it-works-analysis",
-      "description": "A graphic representing the AI analysis process.",
+      "description": "A conceptual graphic for 'AI-Powered Analysis' showing a document being scanned and transformed into data.",
       "imageUrl": "https://images.unsplash.com/photo-1678997389472-5b927885542b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGFpJTIwYW5hbHlzaXN8ZW58MHx8fHwxNzYyMDkwNjU4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "analysis process"
     },
     {
       "id": "how-it-works-report",
-      "description": "A screenshot of the final evidence report.",
+      "description": "A graphic showing a final 'Evidence Report' with a high confidence score and green checkmarks.",
       "imageUrl": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxuZXdzJTIwcmVwb3J0fGVufDB8fHx8MTc2MjA5MDY1OXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "report evidence"
     },
     {
       "id": "document-preview",
-      "description": "A preview of a scanned document for the analysis viewer.",
+      "description": "A high-quality, clear image of a scanned official contract document, with a signature and seal.",
       "imageUrl": "https://images.unsplash.com/photo-1583523996796-6f14e25a428c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb250cmFjdCUyMGRvY3VtZW50fGVufDB8fHx8MTc2MjA5MDY2MHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "document scan"
     }
