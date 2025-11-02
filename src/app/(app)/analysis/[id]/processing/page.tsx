@@ -18,13 +18,14 @@ export default function ProcessingPage({ params }: { params: { id: string } }) {
   const [progress, setProgress] = useState(10);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const router = useRouter();
+  const { id } = params;
 
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setTimeout(() => router.replace(`/analysis/${params.id}`), 1000);
+          setTimeout(() => router.replace(`/analysis/${id}`), 1000);
           return 100;
         }
         const newProgress = prev + Math.random() * 10;
@@ -33,7 +34,7 @@ export default function ProcessingPage({ params }: { params: { id: string } }) {
     }, 400);
 
     return () => clearInterval(timer);
-  }, [router, params.id]);
+  }, [router, id]);
 
   useEffect(() => {
     const stepIndex = Math.min(
