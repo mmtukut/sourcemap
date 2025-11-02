@@ -3,31 +3,31 @@
     {
       "id": "hero-dashboard",
       "description": "A clean and modern UI screenshot of an application dashboard for document analysis.",
-      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhbmFseXRpY3MlMjBkYXNoYm9hcmQlMjB1aXxlbnwwfHx8fDE3NjIxNzg4MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/Dashboard.jpg?alt=media&token=38ec6cca-36ce-42c6-b17f-f74517d8a0a5",
       "imageHint": "dashboard screenshot"
     },
     {
       "id": "how-it-works-upload",
       "description": "A person uploading a file on a laptop, representing the document upload process.",
-      "imageUrl": "https://images.unsplash.com/photo-1584824486516-0555a07fc511?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmaWxlJTIwdXBsb2FkfGVufDB8fHx8MTc2MjE4MzU4NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step%201.png?alt=media&token=b5e55d70-968a-4642-bbba-896a66e2715c",
       "imageHint": "upload interface"
     },
     {
       "id": "how-it-works-analysis",
       "description": "A conceptual image of data and charts on a screen, representing AI analysis.",
-      "imageUrl": "https://images.unsplash.com/photo-1641159028045-a3d75f782353?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhbmFseXRpY3MlMjBwcm9jZXNzfGVufDB8fHx8MTc2MjE4MzY4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step%202.png?alt=media&token=e50e7c24-bbed-41ae-b62f-7eaae54fc2d2",
       "imageHint": "analysis process"
     },
     {
       "id": "how-it-works-report",
       "description": "A graphic showing a final 'Evidence Report' with a high confidence score and green checkmarks.",
-      "imageUrl": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxuZXdzJTIwcmVwb3J0fGVufDB8fHx8MTc2MjA5MDY1OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step%203.png?alt=media&token=d3b9526c-08df-444d-a2c4-7ad87497d5ba",
       "imageHint": "report evidence"
     },
     {
       "id": "document-preview",
       "description": "A high-quality, clear image of a scanned official contract document, with a signature and seal.",
-      "imageUrl": "https://images.unsplash.com/photo-1568992688874-9a437c15b17a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkb2N1bWVudCUyMHNjYW58ZW58MHx8fHwxNzYyMTgzODEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/doc.png?alt=media&token=a2c7bcd8-047d-4ea1-af1a-0224d7a7692b",
       "imageHint": "document scan"
     }
   ]
