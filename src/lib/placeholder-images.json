@@ -3,31 +3,31 @@
     {
       "id": "hero-dashboard",
       "description": "A screenshot of the SourceMap application dashboard, showing analysis results.",
-      "imageUrl": "https://images.unsplash.com/photo-1634743556192-d19f0c69ff3a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxkYXNoYm9hcmQlMjBzY3JlZW5zaG90fGVufDB8fHx8MTc2MjAxMDE3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkYXNoYm9hcmQlMjBhbmFseXRpY3N8ZW58MHx8fHwxNzYyMDkwNjU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "dashboard screenshot"
     },
     {
       "id": "how-it-works-upload",
       "description": "An illustration or screenshot of the document upload interface.",
-      "imageUrl": "https://images.unsplash.com/photo-1649442746245-f51f4b76963f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx1cGxvYWQlMjBpbnRlcmZhY2V8ZW58MHx8fHwxNzYyMDAzNTI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1574933902973-581de6a24f0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWxlJTIwdXBsb2FkJTIwaW50ZXJmYWNlfGVufDB8fHx8MTc2MjA5MDY1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "upload interface"
     },
     {
       "id": "how-it-works-analysis",
       "description": "A graphic representing the AI analysis process.",
-      "imageUrl": "https://images.unsplash.com/photo-1758685848567-a24f55473cc1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhbmFseXNpcyUyMHByb2Nlc3N8ZW58MHx8fHwxNzYyMDgyNjM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1678997389472-5b927885542b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGFpJTIwYW5hbHlzaXN8ZW58MHx8fHwxNzYyMDkwNjU4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "analysis process"
     },
     {
       "id": "how-it-works-report",
       "description": "A screenshot of the final evidence report.",
-      "imageUrl": "https://picsum.photos/seed/hw-report/600/400",
+      "imageUrl": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxuZXdzJTIwcmVwb3J0fGVufDB8fHx8MTc2MjA5MDY1OXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "report evidence"
     },
     {
       "id": "document-preview",
       "description": "A preview of a scanned document for the analysis viewer.",
-      "imageUrl": "https://images.unsplash.com/photo-1618069416986-eb1677ba3cc9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxkb2N1bWVudCUyMHNjYW58ZW58MHx8fHwxNzYyMDgyNjM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1583523996796-6f14e25a428c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb250cmFjdCUyMGRvY3VtZW50fGVufDB8fHx8MTc2MjA5MDY2MHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "document scan"
     }
   ]
