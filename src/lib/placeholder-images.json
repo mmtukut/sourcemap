@@ -3,13 +3,13 @@
     {
       "id": "hero-dashboard",
       "description": "A clean and modern UI screenshot of an application dashboard for document analysis.",
-      "imageUrl": "https://storage.googleapis.com/stabl-media/6979a04a-c07a-4b95-ad17-293b134d193d/hero-dashboard-image.jpeg",
+      "imageUrl": "https://images.unsplash.com/photo-1699711160384-9331a85e4359?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhbmFseXRpY3MlMjBkYXNoYm9hcmQlMjB1aXxlbnwwfHx8fDE3NjIxNzg4MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "dashboard screenshot"
     },
     {
       "id": "how-it-works-upload",
       "description": "A minimalist graphic illustrating the first step of a process: 'Upload Document'.",
-      "imageUrl": "https://storage.googleapis.com/stabl-media/6979a04a-c07a-4b95-ad17-293b134d193d/how-it-works-upload.jpeg",
+      "imageUrl": "https://images.unsplash.com/photo-1574933902973-581de6a24f0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWxlJTIwdXBsb2FkJTIwaW50ZXJmYWNlfGVufDB8fHx8MTc2MjA5MDY1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "upload interface"
     },
     {
