@@ -7,10 +7,10 @@ export default function DashboardPage() {
     <div className="container mx-auto p-0 sm:p-0">
       <div className="space-y-8">
         <header>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold font-headline tracking-tight text-foreground">
             Welcome back, John!
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-sm text-muted-foreground">
             Here's what's happening with your documents today.
           </p>
         </header>

@@ -24,19 +24,19 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="py-20 lg:py-32 bg-card">
+    <section className="py-20 lg:py-32 bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+          <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl">
             Trusted by Leading Journalists
           </h2>
-          <p className="mx-auto max-w-3xl text-gray-500 dark:text-gray-400 md:text-xl/relaxed">
+          <p className="mx-auto max-w-3xl text-muted-foreground md:text-xl/relaxed">
             Hear what reporters and editors on the front lines have to say about SourceMap.
           </p>
         </div>
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="flex flex-col justify-between shadow-lg">
+            <Card key={index} className="flex flex-col justify-between glass-card">
               <CardContent className="pt-6">
                 <blockquote className="text-lg font-semibold leading-snug">
                   “{testimonial.quote}”
@@ -48,8 +48,8 @@ export function Testimonials() {
                   <AvatarFallback>{testimonial.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.title}</p>
+                  <p className="font-semibold font-headline">{testimonial.name}</p>
+                  <p className="text-sm text-muted-foreground">{testimonial.title}</p>
                 </div>
               </footer>
             </Card>

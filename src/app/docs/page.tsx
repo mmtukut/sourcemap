@@ -1,4 +1,4 @@
-import UploadPage from "../upload/page";
+import UploadPage from "@/app/upload/page";
 
 export default function DocsPage() {
   return <UploadPage />;

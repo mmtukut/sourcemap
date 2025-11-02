@@ -33,7 +33,7 @@ export function HowItWorks() {
     <section className="py-20 lg:py-32">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center space-y-4">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+          <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl">
             From Doubt to Certainty in 3 Simple Steps
           </h2>
           <p className="mx-auto max-w-3xl text-gray-500 dark:text-gray-400 md:text-xl/relaxed">
@@ -53,7 +53,7 @@ export function HowItWorks() {
                     data-ai-hint={step.imageHint}
                     className="rounded-2xl object-cover shadow-lg aspect-[3/2]"
                 />
-                <h3 className="mt-6 text-2xl font-bold">{step.name}</h3>
+                <h3 className="mt-6 text-2xl font-bold font-headline">{step.name}</h3>
                 <p className="mt-2 text-gray-500 dark:text-gray-400 max-w-sm">
                   {step.description}
                 </p>

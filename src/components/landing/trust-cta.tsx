@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ShieldCheck, Lock, Award, Power } from 'lucide-react';
+import { Award, ShieldCheck, DatabaseZap } from 'lucide-react';
 
 const trustPoints = [
     {
@@ -9,11 +9,11 @@ const trustPoints = [
     },
     {
         icon: ShieldCheck,
-        text: 'Secure. Explainable. Accountable.'
+        text: 'Secure & Explainable AI.'
     },
     {
-        icon: Power,
-        text: 'Empowering Investigative Journalists Across Africa.'
+        icon: DatabaseZap,
+        text: 'Vast Knowledge Base.'
     }
 ]
 
@@ -23,18 +23,18 @@ export function TrustAndCta() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="space-y-6">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
+                <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl">
                     Join the Journalists Fighting Fraud with AI
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 md:text-xl/relaxed">
+                <p className="text-muted-foreground md:text-xl/relaxed">
                     Stop wasting time on manual verification and start breaking stories that matter. Get the evidence you need to publish with confidence.
                 </p>
                  <Button size="lg" asChild>
                     <Link href="/register">Start Your Free Trial</Link>
                 </Button>
             </div>
-            <div className="space-y-6 rounded-lg bg-card p-8 shadow-lg">
-                <h3 className="text-2xl font-bold">Built on a Foundation of Trust</h3>
+            <div className="space-y-6 rounded-2xl glass-card p-8">
+                <h3 className="text-2xl font-bold font-headline">Built on a Foundation of Trust</h3>
                 <ul className="space-y-4">
                     {trustPoints.map(point => (
                         <li key={point.text} className="flex items-center gap-4">
