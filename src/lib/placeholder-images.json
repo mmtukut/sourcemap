@@ -8,14 +8,14 @@
     },
     {
       "id": "how-it-works-upload",
-      "description": "A minimalist graphic illustrating the first step of a process: 'Upload Document'.",
-      "imageUrl": "https://images.unsplash.com/photo-1574933902973-581de6a24f0b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmaWxlJTIwdXBsb2FkJTIwaW50ZXJmYWNlfGVufDB8fHx8MTc2MjA5MDY1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "A person uploading a file on a laptop, representing the document upload process.",
+      "imageUrl": "https://images.unsplash.com/photo-1584824486516-0555a07fc511?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmaWxlJTIwdXBsb2FkfGVufDB8fHx8MTc2MjE4MzU4NHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "upload interface"
     },
     {
       "id": "how-it-works-analysis",
-      "description": "A conceptual graphic for 'AI-Powered Analysis' showing a document being scanned and transformed into data.",
-      "imageUrl": "https://images.unsplash.com/photo-1678997389472-5b927885542b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGFpJTIwYW5hbHlzaXN8ZW58MHx8fHwxNzYyMDkwNjU4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "A conceptual image of data and charts on a screen, representing AI analysis.",
+      "imageUrl": "https://images.unsplash.com/photo-1641159028045-a3d75f782353?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhbmFseXRpY3MlMjBwcm9jZXNzfGVufDB8fHx8MTc2MjE4MzY4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "analysis process"
     },
     {
@@ -27,7 +27,7 @@
     {
       "id": "document-preview",
       "description": "A high-quality, clear image of a scanned official contract document, with a signature and seal.",
-      "imageUrl": "https://images.unsplash.com/photo-1583523996796-6f14e25a428c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb250cmFjdCUyMGRvY3VtZW50fGVufDB8fHx8MTc2MjA5MDY2MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1568992688874-9a437c15b17a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkb2N1bWVudCUyMHNjYW58ZW58MHx8fHwxNzYyMTgzODEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "document scan"
     }
   ]
