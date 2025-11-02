@@ -7,7 +7,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 export function DocumentViewer() {
     const docImage = PlaceHolderImages.find(p => p.id === 'document-preview')
   return (
-    <Card className="shadow-lg relative h-[600px] flex flex-col">
+    <Card className="shadow-xl rounded-2xl relative h-[600px] flex flex-col">
       <CardHeader>
         <CardTitle>Document Preview</CardTitle>
       </CardHeader>
@@ -17,16 +17,16 @@ export function DocumentViewer() {
           alt="Document preview"
           fill
           data-ai-hint="document scan"
-          className="object-contain rounded-md"
+          className="object-contain rounded-lg"
         />
         {/* Visual Markers */}
         <div
-          className="absolute border-2 border-red-500 bg-red-500/20 rounded-sm"
+          className="absolute border-2 border-red-500 bg-red-500/20 rounded-md"
           style={{ top: '35%', left: '15%', width: '70%', height: '10%' }}
           title="File modified after signature date"
         ></div>
         <div
-          className="absolute border-2 border-yellow-500 bg-yellow-500/20 rounded-sm"
+          className="absolute border-2 border-yellow-500 bg-yellow-500/20 rounded-md"
           style={{ top: '60%', left: '10%', width: '80%', height: '15%' }}
           title="Font mismatch in paragraph 4"
         ></div>

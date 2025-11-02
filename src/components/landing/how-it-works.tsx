@@ -51,7 +51,7 @@ export function HowItWorks() {
                     width={600}
                     height={400}
                     data-ai-hint={step.imageHint}
-                    className="rounded-lg object-cover shadow-lg aspect-[3/2]"
+                    className="rounded-2xl object-cover shadow-lg aspect-[3/2]"
                 />
                 <h3 className="mt-6 text-2xl font-bold">{step.name}</h3>
                 <p className="mt-2 text-gray-500 dark:text-gray-400 max-w-sm">

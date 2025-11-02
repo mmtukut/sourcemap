@@ -24,7 +24,7 @@ const problems = [
 
 export function ProblemSolution() {
   return (
-    <section className="py-20 lg:py-32 bg-card">
+    <section className="py-20 lg:py-32 bg-slate-50 dark:bg-slate-900/50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
@@ -36,7 +36,7 @@ export function ProblemSolution() {
         </div>
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {problems.map((problem) => (
-            <Card key={problem.title} className="text-center shadow-lg hover:shadow-xl transition-shadow">
+            <Card key={problem.title} className="text-center shadow-xl hover:shadow-2xl transition-shadow rounded-2xl">
               <CardHeader>
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                     <problem.icon className="h-6 w-6 text-primary" />

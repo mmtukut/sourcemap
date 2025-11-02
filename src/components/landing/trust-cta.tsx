@@ -1,19 +1,19 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ShieldCheck, Lock, Globe } from 'lucide-react';
+import { ShieldCheck, Lock, Award } from 'lucide-react';
 
 const trustPoints = [
     {
+        icon: Award,
+        text: 'Backed by Leading VCs'
+    },
+    {
         icon: ShieldCheck,
-        text: 'NIGCOMSAT Accelerator Alumnus'
+        text: 'SOC 2 Type II Certified'
     },
     {
         icon: Lock,
-        text: 'End-to-End Encrypted'
-    },
-    {
-        icon: Globe,
-        text: 'Built with Code for Africa'
+        text: 'Trusted by Global Newsrooms'
     }
 ]
 

@@ -43,7 +43,7 @@ export function EvidencePanel({ keyFindings }: EvidencePanelProps) {
   const moderateCount = keyFindings.filter(f => f.type === 'moderate').length;
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-xl rounded-2xl">
       <CardHeader>
         <CardTitle>Evidence Summary</CardTitle>
         <p className="text-muted-foreground">
@@ -58,7 +58,7 @@ export function EvidencePanel({ keyFindings }: EvidencePanelProps) {
             return (
               <AccordionItem value={`item-${index}`} key={index}>
                 <AccordionTrigger
-                  className={`rounded-md px-4 text-left font-semibold hover:no-underline ${config.bgColor} border-l-4 ${config.borderColor}`}
+                  className={`rounded-lg px-4 text-left font-semibold hover:no-underline ${config.bgColor} border-l-4 ${config.borderColor}`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon className={`h-5 w-5 flex-shrink-0 ${config.color}`} />

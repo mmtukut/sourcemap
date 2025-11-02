@@ -36,7 +36,7 @@ export function ConfidenceScore({ score, status }: ConfidenceScoreProps) {
   const config = statusConfig[status];
 
   return (
-    <Card className="overflow-hidden shadow-lg">
+    <Card className="overflow-hidden shadow-xl rounded-2xl">
       <CardHeader className={`${config.bgColor} p-6`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div className='mb-4 sm:mb-0'>

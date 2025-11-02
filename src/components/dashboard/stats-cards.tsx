@@ -28,7 +28,7 @@ export function StatsCards() {
         <h2 className="text-2xl font-bold tracking-tight mb-4">Usage Stats</h2>
         <div className="grid gap-4 md:grid-cols-3">
         {stats.map((stat, index) => (
-            <Card key={index} className="shadow-md">
+            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full ${stat.color}`}>

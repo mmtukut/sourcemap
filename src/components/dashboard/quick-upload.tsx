@@ -11,14 +11,14 @@ export function QuickUpload() {
   };
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg rounded-2xl">
       <CardHeader>
         <CardTitle>Quick Upload</CardTitle>
       </CardHeader>
       <CardContent>
         <div
           onClick={handleUpload}
-          className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 text-center hover:border-primary hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-primary dark:hover:bg-gray-700"
+          className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 text-center hover:border-primary hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-primary dark:hover:bg-gray-700"
         >
           <FileUp className="h-12 w-12 text-gray-400" />
           <p className="mt-4 font-semibold text-gray-600 dark:text-gray-300">

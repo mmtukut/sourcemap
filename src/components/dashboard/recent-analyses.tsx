@@ -51,7 +51,7 @@ const statusStyles = {
 
 export function RecentAnalyses() {
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg rounded-2xl">
       <CardHeader className="flex-row items-center justify-between">
         <div>
             <CardTitle>Recent Analyses</CardTitle>
