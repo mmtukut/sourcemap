@@ -13,10 +13,7 @@ export default function RootLayout({
 }) {
   const pathname = usePathname();
   const isApp =
-    pathname !== '/landing' &&
-    pathname !== '/' &&
-    pathname !== '/login' &&
-    pathname !== '/register';
+    pathname !== '/';
 
   return (
     <html lang="en" suppressHydrationWarning>
