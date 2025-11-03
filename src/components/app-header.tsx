@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -14,9 +15,17 @@ import { SidebarTrigger } from './ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export function AppHeader() {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // In a real app, you would clear the user's session here
+    router.push('/login');
+  };
+
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
       {isMobile && <SidebarTrigger />}
@@ -53,7 +62,7 @@ export function AppHeader() {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>
