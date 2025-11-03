@@ -12,8 +12,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isApp =
-    pathname !== '/';
+  const isApp = pathname.startsWith('/dashboard') || 
+                pathname.startsWith('/upload') || 
+                pathname.startsWith('/library') || 
+                pathname.startsWith('/settings') || 
+                pathname.startsWith('/help') ||
+                pathname.startsWith('/analysis');
+
 
   return (
     <html lang="en" suppressHydrationWarning>
