@@ -38,7 +38,7 @@ export function LandingHeader() {
             <Link href="/login">Login</Link>
           </Button>
           <Button asChild>
-            <Link href="/register">Start Free Trial</Link>
+            <Link href="/register">Get Started Free</Link>
           </Button>
         </div>
       </div>

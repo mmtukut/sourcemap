@@ -1,3 +1,6 @@
+
+'use client';
+
 import {
   Tabs,
   TabsContent,
@@ -19,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import type { AutomatedDocumentAnalysisOutput } from '@/ai/flows/automated-document-analysis';
+import { useEffect, useState } from 'react';
 
 type AnalysisTabsProps = {
   metadataAnalysis: AutomatedDocumentAnalysisOutput['metadataAnalysis'];
@@ -26,6 +30,18 @@ type AnalysisTabsProps = {
 };
 
 export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTabsProps) {
+  const [createdDate, setCreatedDate] = useState('');
+  const [modifiedDate, setModifiedDate] = useState('');
+
+  useEffect(() => {
+    if (metadataAnalysis.created) {
+      setCreatedDate(new Date(metadataAnalysis.created).toLocaleString());
+    }
+    if (metadataAnalysis.modified) {
+      setModifiedDate(new Date(metadataAnalysis.modified).toLocaleString());
+    }
+  }, [metadataAnalysis.created, metadataAnalysis.modified]);
+
   return (
     <Tabs defaultValue="metadata">
       <TabsList className="grid w-full grid-cols-2">
@@ -53,8 +69,8 @@ export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTab
              <div className="space-y-2">
               <h3 className="font-semibold">Creation Data</h3>
               <div className="rounded-lg border p-4 grid grid-cols-2 gap-4 text-sm font-mono">
-                <p>Created: <span className="text-muted-foreground">{new Date(metadataAnalysis.created!).toLocaleString()}</span></p>
-                <p>Modified: <span className="text-muted-foreground">{new Date(metadataAnalysis.modified!).toLocaleString()}</span></p>
+                <p>Created: <span className="text-muted-foreground">{createdDate}</span></p>
+                <p>Modified: <span className="text-muted-foreground">{modifiedDate}</span></p>
                 <p>Author: <span className="text-muted-foreground">{metadataAnalysis.author}</span></p>
                 <p>Creator Tool: <span className="text-muted-foreground">{metadataAnalysis.creatorTool}</span></p>
               </div>

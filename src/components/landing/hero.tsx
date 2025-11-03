@@ -24,7 +24,7 @@ export function Hero() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
               <Button size="lg" asChild>
-                <Link href="/register">Start Free Trial</Link>
+                <Link href="/register">Get Started Free</Link>
               </Button>
               <Button size="lg" variant="outline">
                 <PlayCircle className="mr-2 h-5 w-5" />
