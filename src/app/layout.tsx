@@ -12,12 +12,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isApp = pathname.startsWith('/dashboard') || 
-                pathname.startsWith('/upload') || 
-                pathname.startsWith('/library') || 
-                pathname.startsWith('/settings') || 
-                pathname.startsWith('/help') ||
-                pathname.startsWith('/analysis');
+  const isApp =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/upload') ||
+    pathname.startsWith('/library') ||
+    pathname.startsWith('/settings') ||
+    pathname.startsWith('/help') ||
+    pathname.startsWith('/analysis');
+
+  const isAuth = pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isLanding = pathname.startsWith('/landing');
 
 
   return (
