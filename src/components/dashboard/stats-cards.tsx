@@ -6,33 +6,36 @@ const stats = [
     title: 'Analyses This Month',
     value: '12 / 25',
     icon: FileCheck,
-    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
   },
   {
     title: 'Remaining Credits',
     value: '₦15,000',
     icon: CircleDollarSign,
-    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
   },
   {
     title: 'Documents Pending',
     value: '8',
     icon: FileClock,
-    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-500/10',
   },
 ];
 
 export function StatsCards() {
   return (
     <div>
-        <h2 className="text-2xl font-bold tracking-tight mb-4">Usage Stats</h2>
+        <h2 className="text-2xl font-bold font-headline tracking-tight mb-4">Usage Stats</h2>
         <div className="grid gap-4 md:grid-cols-3">
         {stats.map((stat, index) => (
-            <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow rounded-2xl">
+            <Card key={index} className="glass-card hover:shadow-2xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${stat.color}`}>
-                    <stat.icon className="h-5 w-5" />
+                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${stat.bgColor}`}>
+                    <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
             </CardHeader>
             <CardContent>

@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Sidebar,
@@ -17,8 +18,9 @@ import {
   Library,
   Settings,
   HelpCircle,
+  LogOut,
 } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from './ui/button';
@@ -33,7 +35,7 @@ import {
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/upload', label: 'Documents', icon: FileText },
+  { href: '/upload', label: 'Upload', icon: FileText },
   { href: '/library', label: 'Library', icon: Library },
 ];
 
@@ -44,7 +46,14 @@ const settingsItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { state } = useSidebar();
+  
+  const handleLogout = () => {
+    // In a real app, you'd clear session/token here
+    router.push('/login');
+  };
+
 
   return (
     <Sidebar collapsible="icon" side="left" variant="sidebar">
@@ -90,6 +99,16 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={handleLogout}
+                tooltip="Log Out"
+                className="justify-start"
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Log Out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           {state === 'collapsed' ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -116,7 +135,10 @@ export function AppSidebar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Log out</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : null}

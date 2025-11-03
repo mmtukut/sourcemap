@@ -44,14 +44,14 @@ const analyses = [
 ];
 
 const statusStyles = {
-  clear: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  review: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  flag: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+  clear: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 border-green-400',
+  review: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200 border-yellow-400',
+  flag: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-red-400',
 };
 
 export function RecentAnalyses() {
   return (
-    <Card className="shadow-lg rounded-2xl">
+    <Card className="glass-card">
       <CardHeader className="flex-row items-center justify-between">
         <div>
             <CardTitle>Recent Analyses</CardTitle>
@@ -74,10 +74,10 @@ export function RecentAnalyses() {
           </TableHeader>
           <TableBody>
             {analyses.map((analysis) => (
-              <TableRow key={analysis.name} className="cursor-pointer hover:bg-muted/50">
+              <TableRow key={analysis.name} className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
                 <TableCell className="font-medium">{analysis.name}</TableCell>
                 <TableCell>
-                  <Badge className={`capitalize ${statusStyles[analysis.status as keyof typeof statusStyles]}`}>
+                  <Badge variant="outline" className={`capitalize ${statusStyles[analysis.status as keyof typeof statusStyles]}`}>
                     {analysis.status}
                   </Badge>
                 </TableCell>
