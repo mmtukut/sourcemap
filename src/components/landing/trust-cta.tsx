@@ -31,7 +31,7 @@ export function TrustAndCta() {
                     Stop wasting time on manual verification and start breaking stories that matter. Get the evidence you need to publish with confidence.
                 </p>
                  <Button size="lg" asChild>
-                    <Link href="/register">Try SourceMap For Your Next Story</Link>
+                    <Link href="/register">Try SourceMap for Your Next Story</Link>
                 </Button>
             </div>
             <div className="space-y-6 rounded-2xl glass-card p-8">

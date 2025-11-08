@@ -84,7 +84,15 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="mt-auto">
         <div className='p-4 group-data-[collapsible=icon]:hidden text-xs text-muted-foreground'>
-             <p>This tool was developed with support from the CJID under the Nigeria AI Collective.</p>
+             <div className="flex items-center gap-2 mb-2">
+                {/* Placeholder for CJID Logo */}
+                <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-500 shrink-0">
+                    CJID
+                </div>
+                <span>
+                    This tool was developed with support from the Centre for Journalism Innovation and Development (CJID) under the Nigeria AI Collective.
+                </span>
+            </div>
         </div>
         <SidebarMenu>
           {settingsItems.map((item) => (
