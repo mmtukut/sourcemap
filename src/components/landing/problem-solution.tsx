@@ -1,24 +1,25 @@
-import { Clock, Ban, GanttChartSquare } from 'lucide-react';
+
+import { Clock, CheckShield, GanttChartSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const problems = [
   {
     icon: Clock,
-    title: 'Weeks of Manual Work',
+    title: 'Protect Your Credibility',
     description:
-      'Journalists spend 2-3 weeks manually verifying documents for a single investigation.',
+      'Journalists spend 2-3 weeks manually verifying documents for a single investigation. We reduce that to minutes.',
   },
   {
-    icon: Ban,
-    title: 'Career-Ending Mistakes',
+    icon: CheckShield,
+    title: 'Verify with Confidence',
     description:
-      'One forged document can destroy a journalist\'s credibility and trigger legal action.',
+      'Publishing a forged document can harm credibility. Our tools help you verify the facts.',
   },
   {
     icon: GanttChartSquare,
-    title: 'Critical Stories Unpublished',
+    title: 'Publish Critical Stories',
     description:
-      'Fear of publishing forged evidence causes many important stories to never run.',
+      'Don\'t let the fear of forged evidence stop you. Get the verifiable proof you need to run important stories.',
   },
 ];
 
@@ -28,10 +29,10 @@ export function ProblemSolution() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center space-y-4">
           <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl">
-            The Cost of Getting It Wrong is Existential
+            Protect your credibility with tools that verify the facts for you.
           </h2>
           <p className="mx-auto max-w-3xl text-muted-foreground md:text-xl/relaxed">
-            In a world of misinformation, document authenticity is your most valuable asset. The risks have never been higher.
+            In a world of misinformation, document authenticity is your most valuable asset. SourceMap gives you the tools to protect it.
           </p>
         </div>
         <div className="mt-12 grid gap-8 md:grid-cols-3">

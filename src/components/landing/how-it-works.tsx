@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -12,7 +13,7 @@ const steps = [
   },
   {
     id: 'analyze',
-    name: '2. AI-Powered Analysis',
+    name: '2. AI-Assisted Analysis',
     description:
       'Our AI checks metadata, detects visual tampering, and compares against a vast knowledge base.',
     imageId: 'how-it-works-analysis',
@@ -37,7 +38,7 @@ export function HowItWorks() {
             From Doubt to Certainty in 3 Simple Steps
           </h2>
           <p className="mx-auto max-w-3xl text-gray-500 dark:text-gray-400 md:text-xl/relaxed">
-            SourceMap streamlines your verification workflow, saving you time and giving you peace of mind.
+            Verification doesn’t have to slow your newsroom down. SourceMap keeps your process fast, transparent, and defensible.
           </p>
         </div>
         <div className="mt-16 grid gap-12 md:grid-cols-3">

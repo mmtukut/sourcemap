@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { PlayCircle } from 'lucide-react';
 import Image from 'next/image';
@@ -16,15 +17,14 @@ export function Hero() {
         <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12">
           <div className="space-y-6 text-center lg:text-left">
             <h1 className="text-4xl font-headline font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl md:text-6xl">
-              Verify Documents in Minutes, Not Weeks
+              Verify documents faster, with confidence.
             </h1>
             <p className="mx-auto max-w-[600px] text-gray-500 dark:text-gray-400 md:text-xl/relaxed lg:mx-0">
-              AI-powered forensics built for Nigerian investigative journalism.
-              Strengthen your stories with verifiable evidence.
+              SourceMap helps Nigerian journalists check authenticity safely and transparently, powered by AI you can understand and trust.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
               <Button size="lg" asChild>
-                <Link href="/register">Get Started Free</Link>
+                <Link href="/register">Start Verifying Documents</Link>
               </Button>
               <Button size="lg" variant="outline">
                 <PlayCircle className="mr-2 h-5 w-5" />

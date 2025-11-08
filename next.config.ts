@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -43,6 +44,14 @@ const nextConfig: NextConfig = {
     ],
   },
   output: 'standalone',
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://151.241.100.160:9000/api/v1/:path*', // Proxy to Backend
+      },
+    ]
+  },
 };
 
 export default nextConfig;

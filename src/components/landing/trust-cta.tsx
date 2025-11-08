@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Award, ShieldCheck, DatabaseZap } from 'lucide-react';
@@ -30,7 +31,7 @@ export function TrustAndCta() {
                     Stop wasting time on manual verification and start breaking stories that matter. Get the evidence you need to publish with confidence.
                 </p>
                  <Button size="lg" asChild>
-                    <Link href="/register">Get Started Free</Link>
+                    <Link href="/register">Try SourceMap For Your Next Story</Link>
                 </Button>
             </div>
             <div className="space-y-6 rounded-2xl glass-card p-8">

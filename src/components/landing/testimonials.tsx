@@ -1,15 +1,16 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 
 const testimonials = [
   {
-    quote: "SourceMap is a game-changer. What used to take us weeks now takes minutes. We can pursue stories we would have abandoned before.",
+    quote: "SourceMap helped us cut verification time from weeks to minutes. We can pursue stories we would have abandoned before.",
     name: "Aisha Bello",
     title: "Investigative Desk, Premium Times",
     avatar: "https/i.pravatar.cc/150?u=aisha-bello"
   },
   {
-    quote: "The explainability is key. I don't just get a score; I get evidence. It makes defending my stories to my editor—and in court—so much easier.",
+    quote: "The explainability helps me defend my story to editors and courts.",
     name: "David Okon",
     title: "Freelance Journalist",
     avatar: "https/i.pravatar.cc/150?u=david-okon"

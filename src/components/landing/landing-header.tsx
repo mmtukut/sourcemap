@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import Link from 'next/link';
@@ -38,7 +39,7 @@ export function LandingHeader() {
             <Link href="/login">Login</Link>
           </Button>
           <Button asChild>
-            <Link href="/register">Get Started Free</Link>
+            <Link href="/register">Start Verifying Documents</Link>
           </Button>
         </div>
       </div>

@@ -83,6 +83,9 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="mt-auto">
+        <div className='p-4 group-data-[collapsible=icon]:hidden text-xs text-muted-foreground'>
+             <p>This tool was developed with support from the CJID under the Nigeria AI Collective.</p>
+        </div>
         <SidebarMenu>
           {settingsItems.map((item) => (
             <SidebarMenuItem key={item.href}>

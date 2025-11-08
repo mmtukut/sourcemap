@@ -1,5 +1,7 @@
+
 import { Logo } from '@/components/logo';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function LandingFooter() {
   return (
@@ -16,6 +18,24 @@ export function LandingFooter() {
                 <Link href="#" className="transition-colors hover:text-foreground/80 text-foreground/60">Terms</Link>
             </nav>
         </div>
+
+        <div className="mt-8 pt-8 border-t text-center space-y-4">
+            <p className="text-sm text-muted-foreground italic">
+                SourceMap is built on Responsible AI — transparent, explainable, and human-guided.
+            </p>
+             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    {/* Placeholder for CJID Logo */}
+                    <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-500">
+                        CJID
+                    </div>
+                    <span>
+                        This tool was developed with support from the Centre for Journalism Innovation and Development (CJID) under the Nigeria AI Collective.
+                    </span>
+                </div>
+            </div>
+        </div>
+
         <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
           © {new Date().getFullYear()} SourceMap • Built in Nigeria 🇳🇬
         </div>
