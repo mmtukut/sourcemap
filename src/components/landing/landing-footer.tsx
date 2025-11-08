@@ -1,4 +1,3 @@
-
 import { Logo } from '@/components/logo';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,10 +24,7 @@ export function LandingFooter() {
             </p>
              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                    {/* Placeholder for CJID Logo */}
-                    <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-500">
-                        CJID
-                    </div>
+                    <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/cjid%20logo.jpg?alt=media&token=7a4b3173-5238-4c49-801b-ff2dc1500975" alt="CJID Logo" width={32} height={32} className="rounded-full" />
                     <span>
                         This tool was developed with support from the Centre for Journalism Innovation and Development (CJID) under the Nigeria AI Collective.
                     </span>

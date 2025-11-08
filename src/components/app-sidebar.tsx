@@ -32,6 +32,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import Image from 'next/image';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
@@ -85,10 +86,7 @@ export function AppSidebar() {
       <SidebarFooter className="mt-auto">
         <div className='p-4 group-data-[collapsible=icon]:hidden text-xs text-muted-foreground'>
              <div className="flex items-center gap-2 mb-2">
-                {/* Placeholder for CJID Logo */}
-                <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-500 shrink-0">
-                    CJID
-                </div>
+                <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/cjid%20logo.jpg?alt=media&token=7a4b3173-5238-4c49-801b-ff2dc1500975" alt="CJID Logo" width={32} height={32} className="rounded-full shrink-0" />
                 <span>
                     This tool was developed with support from the Centre for Journalism Innovation and Development (CJID) under the Nigeria AI Collective.
                 </span>
