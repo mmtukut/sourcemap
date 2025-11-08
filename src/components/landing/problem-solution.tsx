@@ -1,5 +1,5 @@
 
-import { Clock, CheckShield, GanttChartSquare } from 'lucide-react';
+import { Clock, ShieldCheck, GanttChartSquare } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const problems = [
@@ -10,7 +10,7 @@ const problems = [
       'Journalists spend 2-3 weeks manually verifying documents for a single investigation. We reduce that to minutes.',
   },
   {
-    icon: CheckShield,
+    icon: ShieldCheck,
     title: 'Verify with Confidence',
     description:
       'Publishing a forged document can harm credibility. Our tools help you verify the facts.',
@@ -19,7 +19,7 @@ const problems = [
     icon: GanttChartSquare,
     title: 'Publish Critical Stories',
     description:
-      'Don\'t let the fear of forged evidence stop you. Get the verifiable proof you need to run important stories.',
+      "Don't let the fear of forged evidence stop you. Get the verifiable proof you need to run important stories.",
   },
 ];
 
