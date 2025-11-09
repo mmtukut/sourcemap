@@ -12,8 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 
 // NOTE: Using a proxy to bypass CORS issues in development.
-// In a production environment, you would configure CORS on the backend
-// and use the direct API URL.
+// The rewrite in next.config.js handles pointing this to the backend.
 const API_BASE_URL = '/api'; 
 
 export default function UploadPage() {
@@ -111,12 +110,13 @@ export default function UploadPage() {
     formData.append('file', file);
 
     try {
+        // Use the proxied API path
         const res = await fetch(`${API_BASE_URL}/documents/upload`, {
             method: 'POST',
             body: formData,
-            // You might need to add headers if your API requires them e.g. for auth
         });
         
+        // This is a simple simulation for the upload progress bar
         setUploadProgress(100);
 
         if (!res.ok) {
