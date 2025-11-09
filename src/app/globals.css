@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 84% 4.9%;
 
-    --primary: 226 70% 50%; /* A slightly brighter blue */
+    --primary: 215 50% 30%; /* Deep Navy Blue from Logo */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 14% 90%;
@@ -22,7 +22,7 @@
     --muted: 220 9% 45%;
     --muted-foreground: 220 9% 45%;
 
-    --accent: 258 90% 66%;
+    --accent: 100 60% 45%; /* Vibrant Green from Logo */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
@@ -30,7 +30,7 @@
 
     --border: 220 13% 85%;
     --input: 220 13% 91%;
-    --ring: 226 70% 50%;
+    --ring: 215 50% 30%; /* Ring color matches primary */
 
     --radius: 1rem; /* Larger radius for more rounded corners */
 
@@ -69,7 +69,7 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 258 90% 66%;
+    --accent: 100 60% 55%; /* Brighter Green for dark mode */
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
