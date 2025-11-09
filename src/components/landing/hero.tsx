@@ -46,6 +46,7 @@ export function Hero() {
               alt="SourceMap Dashboard"
               data-ai-hint="dashboard screenshot"
               className="w-full rounded-2xl object-cover shadow-2xl"
+              priority
             />
           </div>
         </div>

@@ -9,19 +9,19 @@
     {
       "id": "how-it-works-upload",
       "description": "A person uploading a file on a laptop, representing the document upload process.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step1.png?alt=media&token=89a3f691-27c3-4aec-a59b-28431fe215f1",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step1.png?alt=media&token=5e29b71f-696a-4710-9cff-5de0d04b0c95",
       "imageHint": "upload interface"
     },
     {
       "id": "how-it-works-analysis",
       "description": "A conceptual image of data and charts on a screen, representing AI analysis.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step2.png?alt=media&token=9b99d07d-c674-4a0e-a182-9f2b8dd1063b",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step2.png?alt=media&token=fde59cb0-8eca-4069-b3d2-d4c24b5b1df4",
       "imageHint": "analysis process"
     },
     {
       "id": "how-it-works-report",
       "description": "A graphic showing a final 'Evidence Report' with a high confidence score and green checkmarks.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step3.png?alt=media&token=c957a133-c28c-4b53-bab1-085f92178391",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step3.png?alt=media&token=7c7b8ae0-d9d5-43a9-bd51-ee32dbf0e0f6",
       "imageHint": "report evidence"
     },
     {
