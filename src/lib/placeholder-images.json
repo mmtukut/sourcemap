@@ -3,31 +3,31 @@
     {
       "id": "hero-dashboard",
       "description": "A clean and modern UI screenshot of an application dashboard for document analysis.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/Dashboard.jpg?alt=media&token=38ec6cca-36ce-42c6-b17f-f74517d8a0a5",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/Dashboard.jpg?alt=media&token=64098c7f-407b-428e-beda-bd95b65a0cf5",
       "imageHint": "dashboard screenshot"
     },
     {
       "id": "how-it-works-upload",
       "description": "A person uploading a file on a laptop, representing the document upload process.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step%201.png?alt=media&token=b5e55d70-968a-4642-bbba-896a66e2715c",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step1.png?alt=media&token=89a3f691-27c3-4aec-a59b-28431fe215f1",
       "imageHint": "upload interface"
     },
     {
       "id": "how-it-works-analysis",
       "description": "A conceptual image of data and charts on a screen, representing AI analysis.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step%202.png?alt=media&token=e50e7c24-bbed-41ae-b62f-7eaae54fc2d2",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step2.png?alt=media&token=9b99d07d-c674-4a0e-a182-9f2b8dd1063b",
       "imageHint": "analysis process"
     },
     {
       "id": "how-it-works-report",
       "description": "A graphic showing a final 'Evidence Report' with a high confidence score and green checkmarks.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step%203.png?alt=media&token=d3b9526c-08df-444d-a2c4-7ad87497d5ba",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/step3.png?alt=media&token=c957a133-c28c-4b53-bab1-085f92178391",
       "imageHint": "report evidence"
     },
     {
       "id": "document-preview",
       "description": "A high-quality, clear image of a scanned official contract document, with a signature and seal.",
-      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/doc.png?alt=media&token=a2c7bcd8-047d-4ea1-af1a-0224d7a7692b",
+      "imageUrl": "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/doc.png?alt=media&token=e9dc5dd9-da4e-42d5-92b8-ec74ee82b439",
       "imageHint": "document scan"
     }
   ]

@@ -24,7 +24,7 @@ export function LandingFooter() {
             </p>
              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                    <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/cjid%20logo.jpg?alt=media&token=7a4b3173-5238-4c49-801b-ff2dc1500975" alt="CJID Logo" width={32} height={32} className="rounded-full" />
+                    <Image src="https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/cjid%20logo.jpg?alt=media&token=4cb519f9-8ac5-4916-9501-d9c3dc256e3d" alt="CJID Logo" width={32} height={32} className="rounded-full" />
                     <span>
                         This tool was developed with support from the Centre for Journalism Innovation and Development (CJID) under the Nigeria AI Collective.
                     </span>

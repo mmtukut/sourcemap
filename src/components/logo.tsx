@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 
 const logoUrl =
-  'https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/sourcemap_logo.jpg?alt=media&token=6056fbb8-e232-45b6-ad52-c476a165b7d4';
+  'https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/sourcemap_logo-removebg-preview.png?alt=media&token=4d04baee-5a0c-4c02-b607-be5cd8830d2e';
 
 export function Logo({ className }: { className?: string }) {
   return (
@@ -16,8 +16,8 @@ export function Logo({ className }: { className?: string }) {
         src={logoUrl}
         alt="SourceMap Logo"
         width={140}
-        height={32}
-        className="h-8 w-auto"
+        height={40}
+        className="h-10 w-auto"
         priority
       />
     </div>
