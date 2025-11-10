@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/firebase';
 
 
-const API_BASE_URL = '/api'; 
+const API_BASE_URL = '/api/v1'; 
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);

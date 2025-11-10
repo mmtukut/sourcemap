@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+        source: '/api/v1/:path*',
         destination: 'http://151.241.100.160:9000/api/v1/:path*', // Proxy to Backend
       },
     ]

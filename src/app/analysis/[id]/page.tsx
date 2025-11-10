@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { generateRecommendations, GenerateRecommendationsOutput } from '@/ai/flows/generate-recommendations';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = '/api/v1';
 
 // This is the direct analysis result from the new backend
 type BackendAnalysisResult = {
