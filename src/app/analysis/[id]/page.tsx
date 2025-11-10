@@ -25,7 +25,7 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
   const [recommendations, setRecommendations] = useState<GenerateRecommendationsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const [isPolling, setIsPolling] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!params.id) return;
@@ -35,57 +35,86 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
         const interval = setInterval(async () => {
           try {
             const res = await fetch(`${API_BASE_URL}/documents/analysis/${analysisId}`);
-            if (res.status === 200) {
+            if (res.ok) {
               const data = await res.json();
               // A real backend would have a status field. We will use a mock for now.
               // Let's assume the backend is not fully ready and we use mock data once polling "completes"
-              if (data.status !== 'not_implemented_yet') {
+              if (data.status !== 'not_implemented_yet' && data.status !== 'started') {
                  clearInterval(interval);
                  resolve(data);
+                 return;
               }
+               // This is a temporary addition to use mock data for dev
+               if (data.status === 'not_implemented_yet') {
+                  clearInterval(interval);
+                  console.warn("Analysis endpoint not ready. Using mock data.");
+                  resolve(mockAnalysisData);
+               }
+
             } else if (res.status >= 400) {
                clearInterval(interval);
-               reject(new Error('Failed to fetch analysis status.'));
+               const errorData = await res.json().catch(() => ({error: 'Failed to fetch analysis status.'}));
+               reject(new Error(errorData.error));
             }
           } catch (error) {
             clearInterval(interval);
             reject(error);
           }
         }, 3000); // Poll every 3 seconds
-
-        // For demo purposes, we'll stop polling after some time and show mock data
-        setTimeout(() => {
-            clearInterval(interval);
-            if (!analysisData) { // If data hasn't been fetched yet
-                console.warn("Analysis polling timed out. Using mock data for demonstration.");
-                setAnalysisData(mockAnalysisData);
-                setRecommendations(mockRecommendations);
-                setIsPolling(false);
-            }
-        }, 20000); // 20 second timeout
       });
     };
     
-    // An initial Genkit flow call to get some data structure.
-    // In a real app this might be more sophisticated
-    const fetchInitialData = async () => {
+    const fetchAnalysisData = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
-        // Start polling for results. In a real scenario, the result of pollAnalysisStatus would be used.
-        await pollAnalysisStatus(params.id);
-        
+        const result = await pollAnalysisStatus(params.id);
+        // The backend doesn't quite match the Genkit flow output, so we need to adapt it.
+        // This is a temporary measure until the backend provides the full expected structure.
+        const adaptedResult: AutomatedDocumentAnalysisOutput = {
+            confidenceScore: result.confidence_score || 50,
+            status: result.confidence_score > 80 ? 'clear' : result.confidence_score > 60 ? 'review' : 'flag',
+            keyFindings: result.findings?.map((f: any) => ({
+                type: f.severity === 'high' ? 'critical' : f.severity === 'medium' ? 'moderate' : 'consistent',
+                description: f.type || "Finding",
+                evidence: f.location ? JSON.stringify(f.location) : "No details provided."
+            })) || [],
+            metadataAnalysis: {
+                filename: 'document', // Placeholder
+                size: 'N/A',
+                type: 'N/A',
+                authenticityChecks: [],
+            },
+            similarDocuments: result.similar_documents?.map((d: any) => ({
+                filename: d.ref_id,
+                similarity: d.similarity_score * 100,
+                type: "Reference Document",
+                status: "Verified authentic",
+                keyDifferences: [d.explanation],
+                assessment: d.explanation,
+            })) || []
+        };
+
+        setAnalysisData(adaptedResult);
+
+        // Once we have analysis data, we can generate recommendations
+        const recommendationsResponse = await generateRecommendations({ analysisResults: JSON.stringify(adaptedResult.keyFindings) });
+        setRecommendations(recommendationsResponse);
+
       } catch (e) {
-         setError('Failed to fetch analysis data.');
+         setError((e as Error).message || 'Failed to fetch analysis data.');
          toast({
           variant: 'destructive',
           title: 'Analysis Failed',
           description: (e as Error).message || 'Could not fetch analysis data.',
         });
-        setIsPolling(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchInitialData();
-  }, [params.id, toast, analysisData]);
+    fetchAnalysisData();
+  }, [params.id, toast]);
 
 
   if (error) {
@@ -104,7 +133,7 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
     );
   }
 
-  if (isPolling && !analysisData) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -119,8 +148,11 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
   if (!analysisData || !recommendations) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-          <h2 className="text-2xl font-semibold mb-2">Loading Report...</h2>
+          <h2 className="text-xl font-semibold text-destructive mb-2">Analysis Incomplete</h2>
+           <p className="text-muted-foreground mb-4">Could not retrieve complete analysis data from the server.</p>
+           <Button asChild>
+              <Link href="/dashboard">Return to Dashboard</Link>
+           </Button>
         </div>
       );
   }
@@ -163,4 +195,3 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
     </div>
   );
 }
-
