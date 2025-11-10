@@ -45,7 +45,7 @@ export function DocumentViewer() {
             <Button variant="outline" size="icon">
                 <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="text-sm text-muted-foreground">Page 1 / 3</span>
+            <span className="text-sm text-muted-foreground">Page 1 / 1</span>
             <Button variant="outline" size="icon">
                 <ChevronRight className="h-4 w-4" />
             </Button>
