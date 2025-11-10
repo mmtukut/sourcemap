@@ -91,12 +91,19 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
         
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({ detail: 'Failed to fetch analysis data.'}));
-            throw new Error(errorData.detail || 'The server returned an error.');
+            throw new Error(errorData.detail || errorData.error || 'The server returned an error.');
         }
 
         const result: BackendAnalysisResult = await res.json();
         
         const analysisResult = result.analysis_result;
+
+        // Handle case where analysis is not complete
+        if (!analysisResult) {
+            // This can be a loading state or a specific message
+            // For now, we'll treat it as an error to be safe.
+            throw new Error(result.message || "Analysis is not yet complete.");
+        }
 
         const adaptedResult: AdaptedAnalysisOutput = {
             confidenceScore: analysisResult.confidence_score,

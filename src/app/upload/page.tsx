@@ -103,7 +103,7 @@ export default function UploadPage() {
                 }
             } else {
                  const errorData = JSON.parse(xhr.responseText || '{}');
-                 throw new Error(errorData.detail || 'Analysis failed on the server.');
+                 throw new Error(errorData.detail || errorData.error || 'Analysis failed on the server.');
             }
         };
 

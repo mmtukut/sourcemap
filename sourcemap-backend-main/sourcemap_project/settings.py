@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware', # Disabling for stateless API
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'sourcemap_api.middleware.AuditMiddleware',  # Custom audit middleware
     'django.contrib.messages.middleware.MessageMiddleware',
