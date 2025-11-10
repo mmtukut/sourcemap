@@ -36,7 +36,7 @@ export function LandingHeader() {
         </nav>
         <div className="flex flex-1 items-center justify-end gap-4">
           <Button asChild>
-            <Link href="/register">Start Verifying Documents</Link>
+            <Link href="/register">Start Verifying Docs</Link>
           </Button>
         </div>
       </div>
