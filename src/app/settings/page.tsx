@@ -1,14 +1,105 @@
 
 'use client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth, useUser } from '@/firebase';
+import { useToast } from '@/hooks/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
+const profileSchema = z.object({
+  fullName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  email: z.string().email(),
+});
+
+const passwordSchema = z.object({
+    currentPassword: z.string().min(1, { message: 'Current password is required.'}),
+    newPassword: z.string().min(6, { message: 'New password must be at least 6 characters.' }),
+});
 
 export default function SettingsPage() {
+    const { user } = useUser();
+    const auth = useAuth();
+    const { toast } = useToast();
+
+    const [isProfileLoading, setIsProfileLoading] = useState(false);
+    const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+
+
+    const profileForm = useForm<z.infer<typeof profileSchema>>({
+        resolver: zodResolver(profileSchema),
+        defaultValues: {
+            fullName: user?.displayName ?? '',
+            email: user?.email ?? '',
+        },
+    });
+
+    const passwordForm = useForm<z.infer<typeof passwordSchema>>({
+        resolver: zodResolver(passwordSchema),
+        defaultValues: {
+            currentPassword: '',
+            newPassword: '',
+        },
+    });
+
+
+    async function onProfileSubmit(values: z.infer<typeof profileSchema>) {
+        if (!user) return;
+        setIsProfileLoading(true);
+
+        try {
+            await updateProfile(user, { displayName: values.fullName });
+            toast({
+                title: 'Profile Updated',
+                description: 'Your name has been successfully updated.',
+            });
+        } catch (error: any) {
+             toast({
+                variant: 'destructive',
+                title: 'Update Failed',
+                description: error.message,
+            });
+        } finally {
+            setIsProfileLoading(false);
+        }
+    }
+
+     async function onPasswordSubmit(values: z.infer<typeof passwordSchema>) {
+        if (!user || !user.email) return;
+
+        setIsPasswordLoading(true);
+
+        try {
+            const credential = EmailAuthProvider.credential(user.email, values.currentPassword);
+            await reauthenticateWithCredential(user, credential);
+            await updatePassword(user, values.newPassword);
+            
+            toast({
+                title: 'Password Updated',
+                description: 'Your password has been changed successfully.',
+            });
+            passwordForm.reset();
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Password Update Failed',
+                description: error.code === 'auth/wrong-password' ? 'The current password you entered is incorrect.' : error.message,
+            });
+        } finally {
+            setIsPasswordLoading(false);
+        }
+    }
+
+
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold font-headline tracking-tight">Settings</h1>
@@ -23,32 +114,54 @@ export default function SettingsPage() {
 
         <TabsContent value="profile" className="mt-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal details and password.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" defaultValue="John Doe" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" defaultValue="john.doe@example.com" />
-              </div>
-              <Separator />
-               <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" />
-              </div>
-            </CardContent>
-            <CardContent>
-                <Button>Save Changes</Button>
-            </CardContent>
+            <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+                <CardHeader>
+                <CardTitle>Profile Information</CardTitle>
+                <CardDescription>Update your personal details.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input id="name" {...profileForm.register('fullName')} defaultValue={user?.displayName ?? ''} />
+                    {profileForm.formState.errors.fullName && <p className="text-sm text-destructive">{profileForm.formState.errors.fullName.message}</p>}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input id="email" type="email" defaultValue={user?.email ?? ''} disabled />
+                </div>
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" disabled={isProfileLoading}>
+                        {isProfileLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Save Changes
+                    </Button>
+                </CardFooter>
+            </form>
+            <Separator className='my-4'/>
+            <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
+                <CardHeader>
+                    <CardTitle>Change Password</CardTitle>
+                    <CardDescription>Update your password here. You will be logged out after a successful change.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                     <div className="space-y-2">
+                        <Label htmlFor="current-password">Current Password</Label>
+                        <Input id="current-password" type="password" {...passwordForm.register('currentPassword')} />
+                         {passwordForm.formState.errors.currentPassword && <p className="text-sm text-destructive">{passwordForm.formState.errors.currentPassword.message}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="new-password">New Password</Label>
+                        <Input id="new-password" type="password" {...passwordForm.register('newPassword')} />
+                        {passwordForm.formState.errors.newPassword && <p className="text-sm text-destructive">{passwordForm.formState.errors.newPassword.message}</p>}
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" disabled={isPasswordLoading}>
+                        {isPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Update Password
+                    </Button>
+                </CardFooter>
+            </form>
           </Card>
         </TabsContent>
 
@@ -104,9 +217,9 @@ export default function SettingsPage() {
                 <Switch id="promotions" />
               </div>
             </CardContent>
-             <CardContent>
+             <CardFooter>
                 <Button>Save Preferences</Button>
-            </CardContent>
+            </CardFooter>
           </Card>
         </TabsContent>
 

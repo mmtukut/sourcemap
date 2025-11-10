@@ -25,7 +25,17 @@ export default function UploadPage() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setFile(event.target.files[0]);
+      const selectedFile = event.target.files[0];
+      if (selectedFile.size > 50 * 1024 * 1024) {
+        toast({
+          variant: 'destructive',
+          title: 'File Too Large',
+          description: 'Please select a file smaller than 50MB.',
+        });
+        setFile(null);
+      } else {
+        setFile(selectedFile);
+      }
     }
   };
 
@@ -33,7 +43,17 @@ export default function UploadPage() {
     event.preventDefault();
     event.stopPropagation();
     if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
-      setFile(event.dataTransfer.files[0]);
+      const selectedFile = event.dataTransfer.files[0];
+       if (selectedFile.size > 50 * 1024 * 1024) {
+        toast({
+          variant: 'destructive',
+          title: 'File Too Large',
+          description: 'Please select a file smaller than 50MB.',
+        });
+        setFile(null);
+      } else {
+        setFile(selectedFile);
+      }
     }
   };
 
