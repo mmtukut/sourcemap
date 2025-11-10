@@ -1,8 +1,12 @@
+
+// It is important to include all keys, even if they are empty.
+// Missing keys can cause the "authorizedDomains is not iterable" error.
 export const firebaseConfig = {
-  "projectId": "studio-4130837467-4b1cf",
-  "appId": "1:924691671631:web:bc8c964326eb993cee583a",
-  "apiKey": "AIzaSyA-P6JzhcH2Ozoi595XCevhK9YUcgy9zD0",
-  "authDomain": "studio-4130837467-4b1cf.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "924691671631"
+  apiKey: "AIzaSyA-P6JzhcH2Ozoi595XCevhK9YUcgy9zD0",
+  authDomain: "studio-4130837467-4b1cf.firebaseapp.com",
+  projectId: "studio-4130837467-4b1cf",
+  storageBucket: "studio-4130837467-4b1cf.appspot.com",
+  messagingSenderId: "924691671631",
+  appId: "1:924691671631:web:bc8c964326eb993cee583a",
+  measurementId: ""
 };

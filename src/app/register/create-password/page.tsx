@@ -3,31 +3,26 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { RegisterForm } from '@/components/auth/register-form';
+import { CreatePasswordForm } from '@/components/auth/create-password-form';
 import { Logo } from '@/components/logo';
-import Link from 'next/link';
 
-export default function RegisterPage() {
+export default function CreatePasswordPage() {
     return (
      <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="items-center text-center">
           <Logo />
-          <CardTitle className="text-2xl pt-4">Create an Account</CardTitle>
+          <CardTitle className="text-2xl pt-4">Set Your Password</CardTitle>
           <CardDescription>
-            Enter your details below to get started.
+            Just one more step to secure your account.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RegisterForm />
+          <CreatePasswordForm />
         </CardContent>
-         <CardFooter className='flex justify-center text-sm'>
-            <p>Already have an account? <Link href="/login" className='text-primary font-semibold hover:underline'>Sign in</Link></p>
-        </CardFooter>
       </Card>
     </div>
   );
