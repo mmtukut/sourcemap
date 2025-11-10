@@ -1,0 +1,162 @@
+/**
+ * @fileoverview Firestore Security Rules for SourceMap application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for user profiles, documents, analyses, evidence and recommendations.
+ * Knowledge base documents are publicly readable.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information. Only the authenticated user can access their own profile.
+ * - /users/{userId}/documents/{documentId}: Stores documents uploaded by the user.
+ * - /users/{userId}/documents/{documentId}/analyses/{analysisId}: Stores analysis results for a specific document.
+ * - /users/{userId}/documents/{documentId}/analyses/{analysisId}/evidence/{evidenceId}: Stores evidence found during document analysis.
+ * - /users/{userId}/documents/{documentId}/analyses/{analysisId}/recommendations/{recommendationId}: Stores recommendations provided after document analysis.
+ * - /knowledge_base_documents/{knowledgeBaseDocumentId}: Stores verified authentic documents for RAG. Publicly readable.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed to protect user privacy.
+ * - Authorization Independence is achieved by denormalizing authorization data (`userId`) in subcollections.
+ * - Read-only collections are handled by allowing `get` and `list` operations with `if true`.
+ *
+ * Denormalization for Authorization:
+ * - The `userId` is denormalized into the Document, Analysis, Evidence, and AnalysisRecommendation entities
+ * to ensure that authorization checks can be performed without additional reads.
+ *
+ * Structural Segregation:
+ * - Private user data (profiles, documents, analyses, etc.) are stored under the `/users/{userId}` path.
+ * - Public knowledge base documents are stored in the top-level `/knowledge_base_documents` collection.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the user is signed in.
+     * @path N/A (Helper function)
+     * @allow N/A (Helper function)
+     * @deny N/A (Helper function)
+     * @principle Authentication: Verifies that the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the user ID matches the authenticated user's ID.
+     * @path N/A (Helper function)
+     * @allow N/A (Helper function)
+     * @deny N/A (Helper function)
+     * @principle Authorization: Enforces user ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the user is the owner of an existing document.
+     * @path N/A (Helper function)
+     * @allow N/A (Helper function)
+     * @deny N/A (Helper function)
+     * @principle Robustness: Prevents operations on non-existent documents.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Defines rules for user profiles.
+     * @path /users/{userId}
+     * @allow (create) User with UID 'user_abc' can create their profile at /users/user_abc if request.auth.uid == 'user_abc'.
+     * @allow (get, update, delete) User with UID 'user_abc' can get, update, or delete their profile at /users/user_abc.
+     * @deny (create) User with UID 'user_def' cannot create a profile at /users/user_abc.
+     * @deny (get, update, delete) User with UID 'user_def' cannot get, update, or delete the profile at /users/user_abc.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // User listing is not allowed.
+      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Defines rules for documents uploaded by a user.
+     * @path /users/{userId}/documents/{documentId}
+     * @allow (create) User with UID 'user_abc' can create a document under their profile.
+     * @allow (get, list, update, delete) User with UID 'user_abc' can get, list, update, or delete documents under their profile.
+     * @deny (create, get, list, update, delete) User with UID 'user_def' cannot create, get, list, update, or delete documents under /users/user_abc.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId}/documents/{documentId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Defines rules for analysis results of a document.
+     * @path /users/{userId}/documents/{documentId}/analyses/{analysisId}
+     * @allow (create) User with UID 'user_abc' can create an analysis under their document.
+     * @allow (get, list, update, delete) User with UID 'user_abc' can get, list, update, or delete analyses under their document.
+     * @deny (create, get, list, update, delete) User with UID 'user_def' cannot create, get, list, update, or delete analyses under /users/user_abc.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId}/documents/{documentId}/analyses/{analysisId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.documentId == documentId;
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Defines rules for evidence found during document analysis.
+     * @path /users/{userId}/documents/{documentId}/analyses/{analysisId}/evidence/{evidenceId}
+     * @allow (create) User with UID 'user_abc' can create evidence under their document's analysis.
+     * @allow (get, list, update, delete) User with UID 'user_abc' can get, list, update, or delete evidence under their document's analysis.
+     * @deny (create, get, list, update, delete) User with UID 'user_def' cannot create, get, list, update, or delete evidence under /users/user_abc.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId}/documents/{documentId}/analyses/{analysisId}/evidence/{evidenceId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.analysisId == analysisId;
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Defines rules for recommendations provided after document analysis.
+     * @path /users/{userId}/documents/{documentId}/analyses/{analysisId}/recommendations/{recommendationId}
+     * @allow (create) User with UID 'user_abc' can create a recommendation under their document's analysis.
+     * @allow (get, list, update, delete) User with UID 'user_abc' can get, list, update, or delete recommendations under their document's analysis.
+     * @deny (create, get, list, update, delete) User with UID 'user_def' cannot create, get, list, update, or delete recommendations under /users/user_abc.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId}/documents/{documentId}/analyses/{analysisId}/recommendations/{recommendationId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.analysisId == analysisId;
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Defines rules for knowledge base documents, which are publicly readable.
+     * @path /knowledge_base_documents/{knowledgeBaseDocumentId}
+     * @allow (get, list) Any user can get or list knowledge base documents.
+     * @deny (create, update, delete) No user can create, update, or delete knowledge base documents (requires backend management).
+     * @principle Public read access with restricted writes.
+     */
+    match /knowledge_base_documents/{knowledgeBaseDocumentId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+  }
+}

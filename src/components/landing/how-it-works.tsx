@@ -21,7 +21,7 @@ const steps = [
   },
   {
     id: 'review',
-    name: '3. Review & Publish',
+    name: '3. Review & Decide',
     description:
       'Get a clear, evidence-backed report in minutes. Make informed decisions with confidence.',
     imageId: 'how-it-works-report',

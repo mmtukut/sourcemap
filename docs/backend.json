@@ -1,0 +1,380 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the SourceMap application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "fullName": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "organization": {
+          "type": "string",
+          "description": "The organization the user belongs to."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "fullName",
+        "email",
+        "createdAt"
+      ]
+    },
+    "Document": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Document",
+      "type": "object",
+      "description": "Represents a document uploaded to SourceMap for analysis.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the document."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Document)"
+        },
+        "filename": {
+          "type": "string",
+          "description": "The original filename of the document."
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Timestamp of when the document was uploaded.",
+          "format": "date-time"
+        },
+        "fileSize": {
+          "type": "number",
+          "description": "The size of the document file in bytes."
+        },
+        "fileType": {
+          "type": "string",
+          "description": "The MIME type of the document."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "filename",
+        "uploadDate",
+        "fileSize",
+        "fileType"
+      ]
+    },
+    "Analysis": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Analysis",
+      "type": "object",
+      "description": "Represents an analysis performed on a document.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the analysis."
+        },
+        "documentId": {
+          "type": "string",
+          "description": "Reference to Document. (Relationship: Document 1:N Analysis)"
+        },
+        "analysisDate": {
+          "type": "string",
+          "description": "Timestamp of when the analysis was performed.",
+          "format": "date-time"
+        },
+        "confidenceScore": {
+          "type": "number",
+          "description": "The confidence score assigned to the document's authenticity (0-100)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the analysis (e.g., clear, review, flag)."
+        },
+        "metadataAnalysis": {
+          "type": "boolean",
+          "description": "Indicates if metadata analysis was performed."
+        },
+        "visualTamperingDetection": {
+          "type": "boolean",
+          "description": "Indicates if visual tampering detection was performed."
+        },
+        "ragContextSearch": {
+          "type": "boolean",
+          "description": "Indicates if RAG context search was performed."
+        }
+      },
+      "required": [
+        "id",
+        "documentId",
+        "analysisDate",
+        "confidenceScore",
+        "status",
+        "metadataAnalysis",
+        "visualTamperingDetection",
+        "ragContextSearch"
+      ]
+    },
+    "Evidence": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Evidence",
+      "type": "object",
+      "description": "Represents a piece of evidence found during document analysis.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the evidence."
+        },
+        "analysisId": {
+          "type": "string",
+          "description": "Reference to Analysis. (Relationship: Analysis 1:N Evidence)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of evidence (e.g., metadata inconsistency, font mismatch)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the evidence."
+        },
+        "severity": {
+          "type": "string",
+          "description": "The severity of the evidence (e.g., critical, moderate, consistent)."
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence level for the evidence identified."
+        },
+        "page": {
+          "type": "number",
+          "description": "Page number where the evidence was found."
+        }
+      },
+      "required": [
+        "id",
+        "analysisId",
+        "type",
+        "description",
+        "severity",
+        "confidence"
+      ]
+    },
+    "KnowledgeBaseDocument": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "KnowledgeBaseDocument",
+      "type": "object",
+      "description": "Represents a verified authentic document in the knowledge base used for RAG.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the knowledge base document."
+        },
+        "filename": {
+          "type": "string",
+          "description": "The filename of the knowledge base document."
+        },
+        "documentType": {
+          "type": "string",
+          "description": "The type of document (e.g., Government Contract, Template)."
+        },
+        "verificationDate": {
+          "type": "string",
+          "description": "Timestamp of when the document was verified.",
+          "format": "date-time"
+        },
+        "sourceUri": {
+          "type": "string",
+          "description": "URI where the document was sourced from",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "filename",
+        "documentType",
+        "verificationDate"
+      ]
+    },
+    "AnalysisRecommendation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AnalysisRecommendation",
+      "type": "object",
+      "description": "Represents a recommendation provided after document analysis.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the recommendation."
+        },
+        "analysisId": {
+          "type": "string",
+          "description": "Reference to Analysis. (Relationship: Analysis 1:N AnalysisRecommendation)"
+        },
+        "recommendationText": {
+          "type": "string",
+          "description": "The text of the recommendation."
+        }
+      },
+      "required": [
+        "id",
+        "analysisId",
+        "recommendationText"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Path-based ownership: only the authenticated user can access their own profile.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, matching the Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Stores documents uploaded by the user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who uploaded the document."
+            },
+            {
+              "name": "documentId",
+              "description": "The unique identifier for the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/documents/{documentId}/analyses/{analysisId}",
+        "definition": {
+          "entityName": "Analysis",
+          "schema": {
+            "$ref": "#/backend/entities/Analysis"
+          },
+          "description": "Stores analysis results for a specific document. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who owns the document."
+            },
+            {
+              "name": "documentId",
+              "description": "The unique identifier for the document being analyzed."
+            },
+            {
+              "name": "analysisId",
+              "description": "The unique identifier for the analysis."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/documents/{documentId}/analyses/{analysisId}/evidence/{evidenceId}",
+        "definition": {
+          "entityName": "Evidence",
+          "schema": {
+            "$ref": "#/backend/entities/Evidence"
+          },
+          "description": "Stores evidence found during document analysis. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who owns the document."
+            },
+            {
+              "name": "documentId",
+              "description": "The unique identifier for the document."
+            },
+            {
+              "name": "analysisId",
+              "description": "The unique identifier for the analysis."
+            },
+            {
+              "name": "evidenceId",
+              "description": "The unique identifier for the evidence."
+            }
+          ]
+        }
+      },
+      {
+        "path": "users/{userId}/documents/{documentId}/analyses/{analysisId}/recommendations/{recommendationId}",
+        "definition": {
+          "entityName": "AnalysisRecommendation",
+          "schema": {
+            "$ref": "#/backend/entities/AnalysisRecommendation"
+          },
+          "description": "Stores recommendations provided after document analysis. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who owns the document."
+            },
+            {
+              "name": "documentId",
+              "description": "The unique identifier for the document."
+            },
+            {
+              "name": "analysisId",
+              "description": "The unique identifier for the analysis."
+            },
+            {
+              "name": "recommendationId",
+              "description": "The unique identifier for the analysis recommendation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "knowledge_base_documents/{knowledgeBaseDocumentId}",
+        "definition": {
+          "entityName": "KnowledgeBaseDocument",
+          "schema": {
+            "$ref": "#/backend/entities/KnowledgeBaseDocument"
+          },
+          "description": "Stores verified authentic documents for RAG. Public read access.",
+          "params": [
+            {
+              "name": "knowledgeBaseDocumentId",
+              "description": "The unique identifier for the knowledge base document."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to ensure Authorization Independence, support secure list operations (QAPs), and maintain data integrity.  Authorization Independence is achieved by denormalizing authorization data, specifically the `userId` for documents, analyses, evidence, and recommendations. This eliminates the need for `get()` calls in security rules, allowing for atomic operations. Structural Segregation is applied by organizing data into collections based on ownership and access patterns.\n\nThe `users/{userId}` path establishes path-based ownership for user data, ensuring only the authenticated user can access their profile. Documents, analyses, evidence, and recommendations are nested under the `users/{userId}` path to inherit ownership. The KnowledgeBaseDocuments are stored in a separate collection, with public read access.\n\nThis structure supports secure list operations (QAPs) because rules can efficiently filter based on the `userId` parameter in the path. The absence of `get()` calls also improves performance and simplifies security rules.\n\nTimestamps and other invariants can be enforced in security rules by validating the data being written against the schema.  For example, creation timestamps should not be modified after creation."
+  }
+}
