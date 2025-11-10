@@ -79,7 +79,13 @@ export default function UploadPage() {
 
     try {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${API_BASE_URL}/analyze-file?user_id=${user.uid}`, true);
+        const url = new URL(`${window.location.origin}${API_BASE_URL}/analyze-file`);
+        url.searchParams.append('user_id', user.uid);
+        if (user.email) {
+          url.searchParams.append('user_email', user.email);
+        }
+
+        xhr.open('POST', url.toString(), true);
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {

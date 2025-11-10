@@ -87,6 +87,7 @@ class FileAnalysisView(APIView):
         """
         file_obj = request.FILES.get('file')
         user_id = request.GET.get('user_id', None)
+        user_email = request.GET.get('user_email', None) # Get email from query params
         analysis_type = request.POST.get('analysis_type', 'full')  # 'full', 'vision', 'rag'
         
         if not file_obj:
@@ -106,6 +107,19 @@ class FileAnalysisView(APIView):
                 'error': f'File too large. Maximum size is {settings.MAX_FILE_SIZE / (1024*1024):.1f}MB'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        # Get or create user
+        user = None
+        if user_id:
+            try:
+                user, created = User.objects.get_or_create(
+                    id=user_id,
+                    defaults={'email': user_email or f'{user_id}@example.com', 'full_name': 'Firebase User'}
+                )
+            except Exception as e:
+                 return JsonResponse({
+                    'error': str(e)
+                }, status=status.HTTP_400_BAD_REQUEST)
+
         # Generate document ID
         doc_id = str(uuid.uuid4())
         
@@ -125,7 +139,7 @@ class FileAnalysisView(APIView):
         try:
             document = Document.objects.create(
                 id=doc_id,
-                user_id_id=user_id,  # Assuming user_id is stored directly in the model
+                user_id=user,
                 filename=file_obj.name,
                 storage_path=str(file_path),
                 status="pending",  # Start with pending status
