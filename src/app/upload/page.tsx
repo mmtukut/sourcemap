@@ -90,7 +90,7 @@ export default function UploadPage() {
 
         xhr.onload = () => {
             setIsUploading(false);
-            if (xhr.status === 200) {
+            if (xhr.status === 200 || xhr.status === 201) {
                 const response = JSON.parse(xhr.responseText);
                 if (response.document_id) {
                      toast({
