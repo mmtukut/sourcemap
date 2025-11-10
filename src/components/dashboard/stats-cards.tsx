@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileCheck, FileClock, CircleDollarSign, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useUser } from '@/firebase';
 
 const API_BASE_URL = '/api/v1';
 
@@ -36,11 +37,15 @@ const initialStats = [
 export function StatsCards() {
     const [stats, setStats] = useState(initialStats);
     const [loading, setLoading] = useState(true);
+    const { user } = useUser();
 
     useEffect(() => {
+        if (!user) return;
+        
         const fetchUsage = async () => {
             try {
-                const res = await fetch(`${API_BASE_URL}/users/me/usage`);
+                // Pass user ID for tracking as per backend plan
+                const res = await fetch(`${API_BASE_URL}/users/me/usage?user_id=${user.uid}`);
                 if(res.ok) {
                     const data = await res.json();
                     setStats(prev => prev.map(s => s.id === 'analyses' ? {...s, value: `${data.usage_count || 0} / 25`} : s));
@@ -53,7 +58,7 @@ export function StatsCards() {
             }
         };
         fetchUsage();
-    }, []);
+    }, [user]);
 
   return (
     <div>

@@ -10,6 +10,8 @@ import { UploadCloud, File, X, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/firebase';
+
 
 // NOTE: Using a proxy to bypass CORS issues in development.
 // The rewrite in next.config.js handles pointing this to the backend.
@@ -23,6 +25,7 @@ export default function UploadPage() {
   const [uploadStatus, setUploadStatus] = useState('idle');
   const router = useRouter();
   const { toast } = useToast();
+  const { user } = useUser();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -49,7 +52,7 @@ export default function UploadPage() {
   
   const startAnalysis = async (documentId: string): Promise<string> => {
     setUploadStatus('starting_analysis');
-    const res = await fetch(`${API_BASE_URL}/documents/${documentId}/analyze`, {
+    const res = await fetch(`${API_BASE_URL}/documents/${documentId}/analyze?user_id=${user?.uid}`, {
       method: 'POST',
     });
 
@@ -97,7 +100,7 @@ export default function UploadPage() {
 
 
   const handleUpload = async () => {
-    if (files.length === 0) return;
+    if (files.length === 0 || !user) return;
     
     // For now, we only handle single file uploads as per the backend spec
     if (files.length > 1) {
@@ -119,7 +122,7 @@ export default function UploadPage() {
     formData.append('file', file);
 
     try {
-        const uploadRes = await fetch(`${API_BASE_URL}/documents/upload`, {
+        const uploadRes = await fetch(`${API_BASE_URL}/documents/upload?user_id=${user.uid}`, {
             method: 'POST',
             body: formData,
         });

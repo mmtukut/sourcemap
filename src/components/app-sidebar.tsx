@@ -20,7 +20,7 @@ import {
   HelpCircle,
   LogOut,
 } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from './ui/button';
@@ -33,6 +33,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import Image from 'next/image';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
@@ -47,13 +49,18 @@ const settingsItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const auth = useAuth();
+  const { user } = useUser();
   const { state } = useSidebar();
   
   const handleLogout = () => {
-    // In a real app, you'd clear session/token here
-    router.push('/login');
+    signOut(auth);
   };
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
 
 
   return (
@@ -127,19 +134,19 @@ export function AppSidebar() {
                 >
                   <Avatar className="h-9 w-9">
                     <AvatarImage
-                      src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                      src={user?.photoURL ?? undefined}
                       alt="User avatar"
                     />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="mb-2 w-56" side="right" align="start">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">John Doe</p>
+                    <p className="text-sm font-medium leading-none">{user?.displayName ?? 'User'}</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      john.doe@example.com
+                      {user?.email ?? 'No email'}
                     </p>
                   </div>
                 </DropdownMenuLabel>

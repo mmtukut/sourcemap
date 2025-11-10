@@ -15,16 +15,24 @@ import { SidebarTrigger } from './ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+
 
 export function AppHeader() {
   const { isMobile } = useSidebar();
-  const router = useRouter();
+  const auth = useAuth();
+  const { user } = useUser();
 
   const handleLogout = () => {
-    // In a real app, you would clear the user's session here
-    router.push('/login');
+    signOut(auth);
   };
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
+
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -34,8 +42,8 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
               <Avatar className="h-9 w-9">
-                <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="User avatar" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src={user?.photoURL ?? undefined} alt="User avatar" />
+                <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
@@ -43,10 +51,10 @@ export function AppHeader() {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">
-                  John Doe
+                  {user?.displayName ?? 'User'}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  john.doe@example.com
+                  {user?.email ?? 'No email'}
                 </p>
               </div>
             </DropdownMenuLabel>
