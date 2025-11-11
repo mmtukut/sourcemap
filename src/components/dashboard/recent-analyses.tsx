@@ -52,16 +52,17 @@ export function RecentAnalyses() {
       try {
         const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
         if (!res.ok) {
-          throw new Error('Failed to fetch recent analyses');
+           const errorMessage = `Could not connect to server (Status: ${res.status}). Please ensure the backend is running.`;
+           throw new Error(errorMessage);
         }
         const data = await res.json();
         setAnalyses(data);
       } catch (error) {
-        const errorMessage = (error as Error).message || 'Could not load analyses.';
+        const errorMessage = (error as Error).message || 'An unknown error occurred.';
         setError(errorMessage);
         toast({
           variant: 'destructive',
-          title: 'Error',
+          title: 'Error Loading Analyses',
           description: errorMessage,
         });
       } finally {

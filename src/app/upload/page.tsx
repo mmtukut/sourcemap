@@ -108,7 +108,17 @@ export default function UploadPage() {
                      throw new Error('Analysis completed, but no document ID was returned.');
                 }
             } else {
-                 const errorData = JSON.parse(xhr.responseText || '{}');
+                 let errorData;
+                 try {
+                   errorData = JSON.parse(xhr.responseText || '{}');
+                 } catch (e) {
+                    // This means the response was not JSON, likely an HTML error page
+                    if (xhr.responseText.toLowerCase().includes('internal server error') || xhr.responseText.toLowerCase().includes('traceback')) {
+                        throw new Error('A critical error occurred on the server. Please contact support.');
+                    } else {
+                        throw new Error(`Server returned a non-JSON error (Status: ${xhr.status}).`);
+                    }
+                 }
                  throw new Error(errorData.detail || errorData.error || 'Analysis failed on the server.');
             }
         };
