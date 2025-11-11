@@ -70,7 +70,7 @@ def health_check(request):
     ],
     responses={
         200: OpenApiTypes.OBJECT,
-        400: OpenApiTypes.OBJECT,
+        400: Open-ApiTypes.OBJECT,
         500: OpenApiTypes.OBJECT
     }
 )
@@ -416,3 +416,5 @@ def get_analysis_result(request, document_id):
         return Response({
             'error': f'Error retrieving analysis: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    
