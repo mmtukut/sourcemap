@@ -119,7 +119,7 @@ class FileAnalysisView(APIView):
                  return JsonResponse({
                     'error': str(e),
                     'detail': 'Failed to get or create user in the backend.'
-                }, status=status.HTTP_400_INTERNAL_SERVER_ERROR)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         # Generate document ID
         doc_id = str(uuid.uuid4())
@@ -153,19 +153,29 @@ class FileAnalysisView(APIView):
             document.refresh_from_db()
             
             # Get the analysis results if they exist
-            analysis_results = AnalysisResult.objects.filter(doc_id=document)
-            if analysis_results.exists():
-                latest_analysis = analysis_results.latest('created_at')
+            analysis_result = AnalysisResult.objects.filter(doc_id=document).order_by('-created_at').first()
+            if analysis_result:
+                # Fetch related evidence (anomalies)
+                evidence = AnomalyDetection.objects.filter(analysis_id=analysis_result)
+                
+                # Structure the response
                 return Response({
                     'document_id': doc_id,
                     'filename': file_obj.name,
                     'status': document.status,
                     'analysis_result': {
-                        'id': str(latest_analysis.id),
-                        'confidence_score': latest_analysis.confidence_score,
-                        'sub_scores': latest_analysis.sub_scores,
-                        'findings': latest_analysis.findings,
-                        'created_at': latest_analysis.created_at
+                        'id': str(analysis_result.id),
+                        'confidence_score': analysis_result.confidence_score,
+                        'assessment': analysis_result.findings,
+                        'evidence': [
+                            {
+                                'type': item.type,
+                                'description': item.location.get('description', ''),
+                                'severity': item.severity,
+                                'confidence': item.confidence
+                            } for item in evidence
+                        ],
+                        'created_at': analysis_result.created_at
                     }
                 }, status=status.HTTP_200_OK)
             else:
@@ -381,30 +391,32 @@ def get_analysis_result(request, document_id):
     except Document.DoesNotExist:
         return Response({'error': 'Document not found'}, status=status.HTTP_404_NOT_FOUND)
     
-    # Get the analysis results if they exist
     try:
-        analysis_results = AnalysisResult.objects.filter(doc_id=document)
-        if analysis_results.exists():
-            # Return the latest analysis result
-            latest_analysis = analysis_results.latest('created_at')
+        analysis_result = AnalysisResult.objects.filter(doc_id=document).order_by('-created_at').first()
+        if analysis_result:
+            evidence = AnomalyDetection.objects.filter(analysis_id=analysis_result)
             return Response({
                 'document_id': document.id,
+                'filename': document.filename,
                 'status': document.status,
                 'analysis_result': {
-                    'id': str(latest_analysis.id),
-                    'confidence_score': latest_analysis.confidence_score,
-                    'sub_scores': latest_analysis.sub_scores,
-                    'findings': latest_analysis.findings,
-                    'created_at': latest_analysis.created_at
+                    'id': str(analysis_result.id),
+                    'confidence_score': analysis_result.confidence_score,
+                    'assessment': analysis_result.findings,
+                    'evidence': [
+                        {
+                            'type': item.type,
+                            'description': item.location.get('description', ''),
+                            'severity': item.severity,
+                            'confidence': item.confidence
+                        } for item in evidence
+                    ],
+                    'created_at': analysis_result.created_at
                 }
             }, status=status.HTTP_200_OK)
         else:
-            # Return document status if no analysis completed yet
             status_progress_map = {
-                "pending": 10,
-                "processing": 50,
-                "processed": 100,
-                "failed": 100
+                "pending": 10, "processing": 50, "processed": 100, "failed": 100
             }
             progress = status_progress_map.get(document.status, 0)
             
@@ -434,7 +446,6 @@ def get_user_documents(request):
         user = User.objects.get(email=user_email)
         documents = Document.objects.filter(user_id=user).order_by('-created_at')
         
-        # To get the latest analysis for each document
         results = []
         for doc in documents:
             latest_analysis = AnalysisResult.objects.filter(doc_id=doc).order_by('-created_at').first()
@@ -442,12 +453,18 @@ def get_user_documents(request):
                 'id': doc.id,
                 'name': doc.filename,
                 'date': doc.created_at.strftime('%b %d, %Y'),
-                'status': 'processed', # Default status
+                'status': 'processed',
                 'score': None
             }
             if latest_analysis:
-                doc_data['status'] = 'clear' if latest_analysis.confidence_score >= 80 else 'review' if latest_analysis.confidence_score >= 60 else 'flag'
-                doc_data['score'] = latest_analysis.confidence_score
+                score = latest_analysis.confidence_score
+                if score >= 80:
+                    doc_data['status'] = 'clear'
+                elif score >= 60:
+                    doc_data['status'] = 'review'
+                else:
+                    doc_data['status'] = 'flag'
+                doc_data['score'] = score
             else:
                 doc_data['status'] = doc.status
 
@@ -456,6 +473,7 @@ def get_user_documents(request):
         return Response(results)
 
     except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        # Return an empty list if the user is not found, which is a valid case for new users
+        return Response([], status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

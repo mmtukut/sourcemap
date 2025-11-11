@@ -17,7 +17,13 @@ import { useParams } from 'next/navigation';
 
 const API_BASE_URL = '/api/v1';
 
-// This is the direct analysis result from the new backend
+type EvidenceItem = {
+    type: string;
+    description: string;
+    severity: 'critical' | 'moderate' | 'consistent';
+    confidence: number;
+};
+
 type BackendAnalysisResult = {
   document_id: string;
   filename: string;
@@ -25,22 +31,17 @@ type BackendAnalysisResult = {
   analysis_result?: {
     id: string;
     confidence_score: number;
-    sub_scores: Record<string, number>;
-    findings: string[];
+    assessment: string;
+    evidence: EvidenceItem[];
     created_at: string;
   };
   message?: string;
 };
 
-// This matches the format the components are expecting
 type AdaptedAnalysisOutput = {
   confidenceScore: number;
   status: 'clear' | 'review' | 'flag';
-  keyFindings: Array<{
-    type: 'critical' | 'moderate' | 'consistent';
-    description: string;
-    evidence?: string;
-  }>;
+  keyFindings: EvidenceItem[]; // Use the detailed evidence item
   metadataAnalysis: {
     filename: string;
     size: string;
@@ -50,7 +51,7 @@ type AdaptedAnalysisOutput = {
     modified?: string;
     author?: string;
     creatorTool?: string;
-    authenticityChecks: string[];
+    authenticityChecks: string[]; // Keep this for now, can be derived from evidence
   };
   similarDocuments: Array<{
     filename: string;
@@ -62,7 +63,6 @@ type AdaptedAnalysisOutput = {
   }>;
 };
 
-
 export default function AnalysisResultPage() {
   const params = useParams();
   const id = params.id as string;
@@ -72,18 +72,6 @@ export default function AnalysisResultPage() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-
-  // Helper function to determine finding type from description
-  const getFindingType = (description: string): 'critical' | 'moderate' | 'consistent' => {
-      const lowerDesc = description.toLowerCase();
-      if (lowerDesc.includes('tamper') || lowerDesc.includes('forgery') || lowerDesc.includes('critical') || lowerDesc.includes('contradiction')) {
-          return 'critical';
-      }
-      if (lowerDesc.includes('inconsistent') || lowerDesc.includes('anomaly') || lowerDesc.includes('suspicious')) {
-          return 'moderate';
-      }
-      return 'consistent';
-  };
 
   useEffect(() => {
     if (!id) return;
@@ -109,27 +97,27 @@ export default function AnalysisResultPage() {
         
         const score = analysisResult.confidence_score; 
 
+        // Adapt the new structured backend response to the frontend's expected format
         const adaptedResult: AdaptedAnalysisOutput = {
             confidenceScore: score,
             status: score >= 80 ? 'clear' : score >= 60 ? 'review' : 'flag',
-            keyFindings: analysisResult.findings.map((finding: string) => ({
-                type: getFindingType(finding),
-                description: finding,
-                evidence: "Further investigation may be required."
-            })) || [],
+            keyFindings: analysisResult.evidence.map(e => ({...e, type: e.description})), // Map evidence to keyFindings
             metadataAnalysis: { 
                 filename: result.filename, 
-                size: 'N/A', // Not provided by new endpoint
-                type: 'N/A', // Not provided by new endpoint
+                size: 'N/A', // These fields are not in the new backend response
+                type: 'N/A',
                 created: analysisResult.created_at,
-                authenticityChecks: analysisResult.findings,
+                // Create authenticity checks from the descriptions of evidence
+                authenticityChecks: analysisResult.evidence.map(e => e.description),
             },
-            similarDocuments: [] // Not provided by new endpoint
+            similarDocuments: [] // This is not yet provided by the backend
         };
 
         setAnalysisData(adaptedResult);
 
-        const recommendationsResponse = await generateRecommendations({ analysisResults: JSON.stringify(adaptedResult.keyFindings) });
+        // Generate recommendations based on the new structured evidence
+        const recommendationInput = JSON.stringify(adaptedResult.keyFindings.map(f => f.description));
+        const recommendationsResponse = await generateRecommendations({ analysisResults: recommendationInput });
         setRecommendations(recommendationsResponse);
 
       } catch (e) {
@@ -191,6 +179,13 @@ export default function AnalysisResultPage() {
 
   const { confidenceScore, status, keyFindings, metadataAnalysis, similarDocuments } = analysisData;
 
+  // The 'keyFindings' for EvidencePanel now needs to be transformed from the new backend structure
+  const evidencePanelFindings = keyFindings.map(item => ({
+    type: item.severity, // Use severity for the panel's critical/moderate/consistent classification
+    description: item.description,
+    evidence: `Confidence: ${(item.confidence * 100).toFixed(0)}%`
+  }));
+
   return (
     <div className="space-y-8">
       <div>
@@ -212,7 +207,7 @@ export default function AnalysisResultPage() {
           <DocumentViewer />
         </div>
         <div className="lg:col-span-2">
-          <EvidencePanel keyFindings={keyFindings} />
+          <EvidencePanel keyFindings={evidencePanelFindings} />
         </div>
       </div>
       
