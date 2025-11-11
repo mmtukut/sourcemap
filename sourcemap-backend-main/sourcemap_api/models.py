@@ -6,7 +6,7 @@ from django.utils import timezone
 
 
 class User(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True, db_index=True)
     full_name = models.CharField(max_length=255)
     org = models.CharField(max_length=255)

@@ -109,11 +109,11 @@ class FileAnalysisView(APIView):
         
         # Get or create user
         user = None
-        if user_id:
+        if user_email:
             try:
                 user, created = User.objects.get_or_create(
-                    id=user_id,
-                    defaults={'email': user_email or f'{user_id}@example.com', 'full_name': 'Firebase User'}
+                    email=user_email,
+                    defaults={'full_name': 'Firebase User'}
                 )
             except Exception as e:
                  return JsonResponse({
@@ -146,7 +146,7 @@ class FileAnalysisView(APIView):
             )
             
             # Process the document synchronously
-            self._process_and_analyze_file_sync(str(file_path), doc_id, user_id, analysis_type)
+            self._process_and_analyze_file_sync(str(file_path), doc_id, user.id if user else None, analysis_type)
             
             # Get the latest document state from DB
             document.refresh_from_db()
@@ -160,7 +160,7 @@ class FileAnalysisView(APIView):
                     'filename': file_obj.name,
                     'status': document.status,
                     'analysis_result': {
-                        'id': latest_analysis.id,
+                        'id': str(latest_analysis.id),
                         'confidence_score': latest_analysis.confidence_score,
                         'sub_scores': latest_analysis.sub_scores,
                         'findings': latest_analysis.findings,
@@ -389,7 +389,7 @@ def get_analysis_result(request, document_id):
                 'document_id': document.id,
                 'status': document.status,
                 'analysis_result': {
-                    'id': latest_analysis.id,
+                    'id': str(latest_analysis.id),
                     'confidence_score': latest_analysis.confidence_score,
                     'sub_scores': latest_analysis.sub_scores,
                     'findings': latest_analysis.findings,

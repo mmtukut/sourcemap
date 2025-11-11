@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.CharField(max_length=255, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('email', models.EmailField(db_index=True, max_length=254, unique=True)),
                 ('full_name', models.CharField(max_length=255)),
                 ('org', models.CharField(max_length=255)),
@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SimilarDocument',
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4-e, editable=False, primary_key=True, serialize=False)),
+                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('ref_id', models.CharField(max_length=255)),
                 ('similarity_score', models.FloatField()),
                 ('explanation', models.TextField()),

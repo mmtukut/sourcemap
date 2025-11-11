@@ -21,13 +21,14 @@ type BackendAnalysisResult = {
   document_id: string;
   filename: string;
   status: string;
-  analysis_result: {
+  analysis_result?: {
     id: string;
     confidence_score: number;
     sub_scores: Record<string, number>;
     findings: string[];
     created_at: string;
   };
+  message?: string;
 };
 
 // This matches the format the components are expecting
