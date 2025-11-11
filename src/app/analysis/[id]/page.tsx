@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { generateRecommendations, GenerateRecommendationsOutput } from '@/ai/flows/generate-recommendations';
+import { useParams } from 'next/navigation';
 
 const API_BASE_URL = '/api/v1';
 
@@ -62,7 +63,10 @@ type AdaptedAnalysisOutput = {
 };
 
 
-export default function AnalysisResultPage({ params: { id } }: { params: { id: string } }) {
+export default function AnalysisResultPage() {
+  const params = useParams();
+  const id = params.id as string;
+
   const [analysisData, setAnalysisData] = useState<AdaptedAnalysisOutput | null>(null);
   const [recommendations, setRecommendations] = useState<GenerateRecommendationsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
