@@ -63,6 +63,7 @@ type AdaptedAnalysisOutput = {
 
 
 export default function AnalysisResultPage({ params }: { params: { id: string } }) {
+  const { id } = params; // Correctly destructure id from params
   const [analysisData, setAnalysisData] = useState<AdaptedAnalysisOutput | null>(null);
   const [recommendations, setRecommendations] = useState<GenerateRecommendationsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +73,7 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
   // Helper function to determine finding type from description
   const getFindingType = (description: string): 'critical' | 'moderate' | 'consistent' => {
       const lowerDesc = description.toLowerCase();
-      if (lowerDesc.includes('tamper') || lowerDesc.includes('forgery') || lowerDesc.includes('critical')) {
+      if (lowerDesc.includes('tamper') || lowerDesc.includes('forgery') || lowerDesc.includes('critical') || lowerDesc.includes('contradiction')) {
           return 'critical';
       }
       if (lowerDesc.includes('inconsistent') || lowerDesc.includes('anomaly') || lowerDesc.includes('suspicious')) {
@@ -82,13 +83,13 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
   };
 
   useEffect(() => {
-    if (!params.id) return;
+    if (!id) return;
 
     const fetchAnalysisData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/analysis/${params.id}`);
+        const res = await fetch(`${API_BASE_URL}/analysis/${id}`);
         
         if (!res.ok) {
             const errorData = await res.json().catch(() => ({ detail: 'Failed to fetch analysis data.'}));
@@ -99,16 +100,15 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
         
         const analysisResult = result.analysis_result;
 
-        // Handle case where analysis is not complete
         if (!analysisResult) {
-            // This can be a loading state or a specific message
-            // For now, we'll treat it as an error to be safe.
             throw new Error(result.message || "Analysis is not yet complete.");
         }
+        
+        const score = analysisResult.confidence_score * 100; // Assuming the score is 0-1, scale to 0-100
 
         const adaptedResult: AdaptedAnalysisOutput = {
-            confidenceScore: analysisResult.confidence_score,
-            status: analysisResult.confidence_score >= 80 ? 'clear' : analysisResult.confidence_score >= 60 ? 'review' : 'flag',
+            confidenceScore: score,
+            status: score >= 80 ? 'clear' : score >= 60 ? 'review' : 'flag',
             keyFindings: analysisResult.findings.map((finding: string) => ({
                 type: getFindingType(finding),
                 description: finding,
@@ -142,7 +142,7 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
     };
 
     fetchAnalysisData();
-  }, [params.id, toast]);
+  }, [id, toast]);
 
 
   if (error) {
