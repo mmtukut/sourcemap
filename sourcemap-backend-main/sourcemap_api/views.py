@@ -1,3 +1,4 @@
+
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -62,15 +63,15 @@ def health_check(request):
     },
     parameters=[
         OpenApiParameter(
-            name='user_id',
+            name='user_email',
             type=str,
             location=OpenApiParameter.QUERY,
-            description='ID of the user performing the analysis (optional)'
+            description='Email of the user performing the analysis (optional, used for tracking)'
         )
     ],
     responses={
         200: OpenApiTypes.OBJECT,
-        400: Open-ApiTypes.OBJECT,
+        400: OpenApiTypes.OBJECT,
         500: OpenApiTypes.OBJECT
     }
 )
@@ -86,7 +87,6 @@ class FileAnalysisView(APIView):
         Returns the analysis results when complete.
         """
         file_obj = request.FILES.get('file')
-        user_id = request.GET.get('user_id', None)
         user_email = request.GET.get('user_email', None) # Get email from query params
         analysis_type = request.POST.get('analysis_type', 'full')  # 'full', 'vision', 'rag'
         
@@ -107,17 +107,18 @@ class FileAnalysisView(APIView):
                 'error': f'File too large. Maximum size is {settings.MAX_FILE_SIZE / (1024*1024):.1f}MB'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Get or create user
+        # Get or create user by email
         user = None
         if user_email:
             try:
                 user, created = User.objects.get_or_create(
                     email=user_email,
-                    defaults={'full_name': 'Firebase User'}
+                    defaults={'full_name': 'Firebase User'} # Default name for new users
                 )
             except Exception as e:
                  return JsonResponse({
-                    'error': str(e)
+                    'error': str(e),
+                    'detail': 'Failed to get or create user in the backend.'
                 }, status=status.HTTP_400_BAD_REQUEST)
 
         # Generate document ID
@@ -139,7 +140,7 @@ class FileAnalysisView(APIView):
         try:
             document = Document.objects.create(
                 id=doc_id,
-                user_id=user,
+                user_id=user, # Link the user object
                 filename=file_obj.name,
                 storage_path=str(file_path),
                 status="pending",  # Start with pending status
@@ -181,7 +182,8 @@ class FileAnalysisView(APIView):
                 os.remove(str(file_path))
             
             return JsonResponse({
-                'error': str(e)
+                'error': str(e),
+                'detail': 'An internal error occurred while saving the document or running analysis.'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def _process_and_analyze_file_sync(self, file_path, doc_id, user_id, analysis_type):
