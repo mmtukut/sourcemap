@@ -46,7 +46,7 @@ const initialStats: Stat[] = [
 export function StatsCards() {
     const [stats, setStats] = useState(initialStats);
     const [loading, setLoading] = useState(true);
-    const { user }_u = useUser();
+    const { user } = useUser();
 
     useEffect(() => {
         if (!user?.email) return;
