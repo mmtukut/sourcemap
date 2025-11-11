@@ -41,7 +41,7 @@ type BackendAnalysisResult = {
 type AdaptedAnalysisOutput = {
   confidenceScore: number;
   status: 'clear' | 'review' | 'flag';
-  keyFindings: EvidenceItem[]; // Use the detailed evidence item
+  keyFindings: EvidenceItem[]; 
   metadataAnalysis: {
     filename: string;
     size: string;
@@ -51,7 +51,7 @@ type AdaptedAnalysisOutput = {
     modified?: string;
     author?: string;
     creatorTool?: string;
-    authenticityChecks: string[]; // Keep this for now, can be derived from evidence
+    authenticityChecks: string[]; 
   };
   similarDocuments: Array<{
     filename: string;
@@ -65,7 +65,7 @@ type AdaptedAnalysisOutput = {
 
 export default function AnalysisResultPage() {
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
 
   const [analysisData, setAnalysisData] = useState<AdaptedAnalysisOutput | null>(null);
   const [recommendations, setRecommendations] = useState<GenerateRecommendationsOutput | null>(null);
@@ -96,21 +96,21 @@ export default function AnalysisResultPage() {
         }
         
         const score = analysisResult.confidence_score; 
+        const evidenceList = analysisResult.evidence || []; // Default to empty array
 
         // Adapt the new structured backend response to the frontend's expected format
         const adaptedResult: AdaptedAnalysisOutput = {
             confidenceScore: score,
             status: score >= 80 ? 'clear' : score >= 60 ? 'review' : 'flag',
-            keyFindings: analysisResult.evidence.map(e => ({...e, type: e.description})), // Map evidence to keyFindings
+            keyFindings: evidenceList, // Use the safe evidenceList
             metadataAnalysis: { 
                 filename: result.filename, 
-                size: 'N/A', // These fields are not in the new backend response
+                size: 'N/A',
                 type: 'N/A',
                 created: analysisResult.created_at,
-                // Create authenticity checks from the descriptions of evidence
-                authenticityChecks: analysisResult.evidence.map(e => e.description),
+                authenticityChecks: evidenceList.map(e => e.description),
             },
-            similarDocuments: [] // This is not yet provided by the backend
+            similarDocuments: [] 
         };
 
         setAnalysisData(adaptedResult);
@@ -179,9 +179,8 @@ export default function AnalysisResultPage() {
 
   const { confidenceScore, status, keyFindings, metadataAnalysis, similarDocuments } = analysisData;
 
-  // The 'keyFindings' for EvidencePanel now needs to be transformed from the new backend structure
   const evidencePanelFindings = keyFindings.map(item => ({
-    type: item.severity, // Use severity for the panel's critical/moderate/consistent classification
+    type: item.severity, 
     description: item.description,
     evidence: `Confidence: ${(item.confidence * 100).toFixed(0)}%`
   }));

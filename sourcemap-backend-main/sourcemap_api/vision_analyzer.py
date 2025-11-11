@@ -8,7 +8,7 @@ import re
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
-from pydantic import BaseModel as PydanticBaseModel, Field
+from pydantic import BaseModel as PydanticBaseModel, Field, field_validator
 
 from django.conf import settings as django_settings
 from django.db import transaction
@@ -26,7 +26,7 @@ class VisionAnalysis(PydanticBaseModel):
     """A structured analysis of a document's authenticity."""
     assessment: str = Field(description="A high-level summary of the overall findings.")
     confidence_score: float = Field(description="A single overall authenticity score from 0.0 to 100.0.")
-    evidence: List[EvidenceItem] = Field(description="A list of all evidence items found during the analysis.")
+    evidence: List[EvidenceItem] = Field(default_factory=list, description="A list of all evidence items found during the analysis.")
 
 
 class VisionAnalyzer:
