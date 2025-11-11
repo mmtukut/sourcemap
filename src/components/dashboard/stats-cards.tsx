@@ -7,7 +7,16 @@ import { useUser } from '@/firebase';
 
 const API_BASE_URL = '/api/v1';
 
-const initialStats = [
+type Stat = {
+    title: string;
+    value: string;
+    icon: React.ElementType;
+    color: string;
+    bgColor: string;
+    id: 'analyses' | 'credits' | 'pending';
+}
+
+const initialStats: Stat[] = [
   {
     title: 'Analyses This Month',
     value: '...',
@@ -18,7 +27,7 @@ const initialStats = [
   },
   {
     title: 'Remaining Credits',
-    value: '₦15,000',
+    value: 'Unlimited',
     icon: CircleDollarSign,
     color: 'text-green-500',
     bgColor: 'bg-green-500/10',
@@ -26,7 +35,7 @@ const initialStats = [
   },
   {
     title: 'Documents Pending',
-    value: '8',
+    value: '...',
     icon: FileClock,
     color: 'text-yellow-500',
     bgColor: 'bg-yellow-500/10',
@@ -40,24 +49,33 @@ export function StatsCards() {
     const { user } = useUser();
 
     useEffect(() => {
-        if (!user) return;
+        if (!user?.email) return;
         
-        const fetchUsage = async () => {
+        const fetchStats = async () => {
+            setLoading(true);
             try {
-                // Pass user ID for tracking as per backend plan
-                const res = await fetch(`${API_BASE_URL}/users/me/usage?user_id=${user.uid}`);
+                const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
                 if(res.ok) {
                     const data = await res.json();
-                    setStats(prev => prev.map(s => s.id === 'analyses' ? {...s, value: `${data.usage_count || 0} / 25`} : s));
+                    const analysesThisMonth = data.length; // Simplified for now
+                    const pendingDocs = data.filter((d: any) => d.status === 'pending' || d.status === 'processing').length;
+                    
+                    setStats(prev => prev.map(s => {
+                        if (s.id === 'analyses') return {...s, value: `${analysesThisMonth}`};
+                        if (s.id === 'pending') return {...s, value: `${pendingDocs}`};
+                        return s;
+                    }));
+                } else {
+                     throw new Error('Failed to fetch stats');
                 }
             } catch (error) {
                 console.error("Failed to fetch usage stats", error);
-                 setStats(prev => prev.map(s => s.id === 'analyses' ? {...s, value: `N/A`} : s));
+                 setStats(prev => prev.map(s => (s.id === 'analyses' || s.id === 'pending') ? {...s, value: `N/A`} : s));
             } finally {
                 setLoading(false);
             }
         };
-        fetchUsage();
+        fetchStats();
     }, [user]);
 
   return (
@@ -69,7 +87,7 @@ export function StatsCards() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full ${stat.bgColor}`}>
-                    {loading && stat.id === 'analyses' ? <Loader2 className="h-5 w-5 animate-spin" /> : <stat.icon className={`h-5 w-5 ${stat.color}`} />}
+                    {loading && (stat.id === 'analyses' || stat.id === 'pending') ? <Loader2 className="h-5 w-5 animate-spin" /> : <stat.icon className={`h-5 w-5 ${stat.color}`} />}
                 </div>
             </CardHeader>
             <CardContent>

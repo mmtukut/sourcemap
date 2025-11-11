@@ -119,7 +119,7 @@ class FileAnalysisView(APIView):
                  return JsonResponse({
                     'error': str(e),
                     'detail': 'Failed to get or create user in the backend.'
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_400_INTERNAL_SERVER_ERROR)
 
         # Generate document ID
         doc_id = str(uuid.uuid4())
@@ -419,4 +419,43 @@ def get_analysis_result(request, document_id):
             'error': f'Error retrieving analysis: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_documents(request):
+    """
+    Get a list of documents for a specific user.
+    """
+    user_email = request.GET.get('user_email', None)
+    if not user_email:
+        return Response({'error': 'user_email parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email=user_email)
+        documents = Document.objects.filter(user_id=user).order_by('-created_at')
+        
+        # To get the latest analysis for each document
+        results = []
+        for doc in documents:
+            latest_analysis = AnalysisResult.objects.filter(doc_id=doc).order_by('-created_at').first()
+            doc_data = {
+                'id': doc.id,
+                'name': doc.filename,
+                'date': doc.created_at.strftime('%b %d, %Y'),
+                'status': 'processed', # Default status
+                'score': None
+            }
+            if latest_analysis:
+                doc_data['status'] = 'clear' if latest_analysis.confidence_score >= 80 else 'review' if latest_analysis.confidence_score >= 60 else 'flag'
+                doc_data['score'] = latest_analysis.confidence_score
+            else:
+                doc_data['status'] = doc.status
+
+            results.append(doc_data)
+
+        return Response(results)
+
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

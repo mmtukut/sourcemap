@@ -9,6 +9,9 @@ urlpatterns = [
     # User file analysis endpoint (combines upload, processing, and analysis)
     path('analyze-file', views.FileAnalysisView.as_view(), name='file-analysis'),
     
+    # Endpoint to get a list of documents for a user
+    path('documents', views.get_user_documents, name='get-user-documents'),
+
     # Bulk upload endpoint (for database population, not user analysis)
     path('bulk-upload', views.BulkUploadView.as_view(), name='bulk-upload'),
     

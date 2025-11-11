@@ -62,8 +62,7 @@ type AdaptedAnalysisOutput = {
 };
 
 
-export default function AnalysisResultPage({ params }: { params: { id: string } }) {
-  const { id } = params; // Correctly destructure id from params
+export default function AnalysisResultPage({ params: { id } }: { params: { id: string } }) {
   const [analysisData, setAnalysisData] = useState<AdaptedAnalysisOutput | null>(null);
   const [recommendations, setRecommendations] = useState<GenerateRecommendationsOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +103,7 @@ export default function AnalysisResultPage({ params }: { params: { id: string } 
             throw new Error(result.message || "Analysis is not yet complete.");
         }
         
-        const score = analysisResult.confidence_score * 100; // Assuming the score is 0-1, scale to 0-100
+        const score = analysisResult.confidence_score; 
 
         const adaptedResult: AdaptedAnalysisOutput = {
             confidenceScore: score,
