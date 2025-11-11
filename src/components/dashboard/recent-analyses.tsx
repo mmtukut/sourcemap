@@ -44,7 +44,10 @@ export function RecentAnalyses() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email) {
+        setIsLoading(false);
+        return;
+    };
 
     const fetchAnalyses = async () => {
       setIsLoading(true);
@@ -52,13 +55,15 @@ export function RecentAnalyses() {
       try {
         const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
         if (!res.ok) {
-           const errorMessage = `Could not connect to server (Status: ${res.status}). Please ensure the backend is running.`;
+           const errorMessage = `Could not load recent analyses (Status: ${res.status}). Please ensure the backend is running.`;
            throw new Error(errorMessage);
         }
         const data = await res.json();
         setAnalyses(data);
       } catch (error) {
-        const errorMessage = (error as Error).message || 'An unknown error occurred.';
+        const errorMessage = (error as Error).message.includes('fetch') 
+          ? "Could not connect to the backend server. Please ensure it's running."
+          : (error as Error).message;
         setError(errorMessage);
         toast({
           variant: 'destructive',

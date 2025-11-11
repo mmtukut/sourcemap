@@ -46,13 +46,18 @@ const initialStats: Stat[] = [
 export function StatsCards() {
     const [stats, setStats] = useState(initialStats);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const { user } = useUser();
 
     useEffect(() => {
-        if (!user?.email) return;
+        if (!user?.email) {
+            setLoading(false);
+            return;
+        }
         
         const fetchStats = async () => {
             setLoading(true);
+            setError(null);
             try {
                 const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
                 if(res.ok) {
@@ -66,12 +71,15 @@ export function StatsCards() {
                         return s;
                     }));
                 } else {
-                     // Don't throw an error, just log it and handle UI
-                     console.error('Failed to fetch stats:', res.status, res.statusText);
+                     const errorMessage = `Failed to fetch stats: ${res.status} ${res.statusText || ''}`.trim();
+                     setError(errorMessage);
+                     console.error(errorMessage);
                      setStats(prev => prev.map(s => (s.id === 'analyses' || s.id === 'pending') ? {...s, value: `N/A`} : s));
                 }
             } catch (error) {
+                const errorMessage = "Could not connect to the backend server. Please ensure it's running.";
                 console.error("Failed to fetch usage stats", error);
+                setError(errorMessage);
                  setStats(prev => prev.map(s => (s.id === 'analyses' || s.id === 'pending') ? {...s, value: `N/A`} : s));
             } finally {
                 setLoading(false);
@@ -83,6 +91,7 @@ export function StatsCards() {
   return (
     <div>
         <h2 className="text-2xl font-bold font-headline tracking-tight mb-4">Usage Stats</h2>
+        {error && <div className="mb-4 text-sm text-destructive p-3 bg-destructive/10 border border-destructive/20 rounded-md">{error}</div>}
         <div className="grid gap-4 md:grid-cols-3">
         {stats.map((stat, index) => (
             <Card key={index} className="glass-card hover:shadow-2xl transition-shadow">
