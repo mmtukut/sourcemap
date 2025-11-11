@@ -41,12 +41,14 @@ export function RecentAnalyses() {
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.email) return;
 
     const fetchAnalyses = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
         if (!res.ok) {
@@ -55,10 +57,12 @@ export function RecentAnalyses() {
         const data = await res.json();
         setAnalyses(data);
       } catch (error) {
+        const errorMessage = (error as Error).message || 'Could not load analyses.';
+        setError(errorMessage);
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: (error as Error).message,
+          description: errorMessage,
         });
       } finally {
         setIsLoading(false);
@@ -97,6 +101,12 @@ export function RecentAnalyses() {
                   <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
                 </TableCell>
               </TableRow>
+            ) : error ? (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24 text-destructive">
+                        {error}
+                    </TableCell>
+                </TableRow>
             ) : analyses.length > 0 ? (
               analyses.slice(0, 4).map((analysis) => (
                 <TableRow key={analysis.id} className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">

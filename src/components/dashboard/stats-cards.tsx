@@ -66,7 +66,9 @@ export function StatsCards() {
                         return s;
                     }));
                 } else {
-                     throw new Error('Failed to fetch stats');
+                     // Don't throw an error, just log it and handle UI
+                     console.error('Failed to fetch stats:', res.status, res.statusText);
+                     setStats(prev => prev.map(s => (s.id === 'analyses' || s.id === 'pending') ? {...s, value: `N/A`} : s));
                 }
             } catch (error) {
                 console.error("Failed to fetch usage stats", error);

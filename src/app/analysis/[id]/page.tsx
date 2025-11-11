@@ -115,10 +115,21 @@ export default function AnalysisResultPage() {
 
         setAnalysisData(adaptedResult);
 
-        // Generate recommendations based on the new structured evidence
-        const recommendationInput = JSON.stringify(adaptedResult.keyFindings.map(f => f.description));
-        const recommendationsResponse = await generateRecommendations({ analysisResults: recommendationInput });
-        setRecommendations(recommendationsResponse);
+        // Generate recommendations, but handle potential failures gracefully
+        try {
+            const recommendationInput = JSON.stringify(adaptedResult.keyFindings.map(f => f.description));
+            const recommendationsResponse = await generateRecommendations({ analysisResults: recommendationInput });
+            setRecommendations(recommendationsResponse);
+        } catch (recError) {
+            console.error("Failed to generate recommendations:", recError);
+            toast({
+              variant: 'destructive',
+              title: 'Could Not Load AI Recommendations',
+              description: 'The AI service may be temporarily unavailable. The main analysis is still shown.',
+            });
+            // Set a default state for recommendations so the page can still render
+            setRecommendations({ recommendations: ['AI recommendations are currently unavailable. Please check back later.'] });
+        }
 
       } catch (e) {
          setError((e as Error).message || 'Failed to fetch analysis data.');
