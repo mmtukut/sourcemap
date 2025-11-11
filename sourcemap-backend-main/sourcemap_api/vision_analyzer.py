@@ -28,6 +28,9 @@ class VisionAnalysis(PydanticBaseModel):
     confidence_score: float = Field(description="A single overall authenticity score from 0.0 to 100.0.")
     evidence: List[EvidenceItem] = Field(default_factory=list, description="A list of all evidence items found during the analysis.")
 
+class RecommendationResponse(PydanticBaseModel):
+    """A list of recommendations for the user."""
+    recommendations: List[str] = Field(description="A list of recommended next steps for the user to take.")
 
 class VisionAnalyzer:
     def __init__(self):
@@ -38,9 +41,34 @@ class VisionAnalyzer:
         )
         try:
             self.structured_llm = self.llm.with_structured_output(VisionAnalysis)
+            self.recommendation_llm = self.llm.with_structured_output(RecommendationResponse)
         except (NotImplementedError, TypeError, AttributeError) as e:
             logger.warning(f"Structured output not available, using fallback method. Error: {e}")
             self.structured_llm = None
+            self.recommendation_llm = None
+
+    def _generate_recommendations(self, analysis: VisionAnalysis) -> List[str]:
+        """Generate actionable recommendations based on the analysis findings."""
+        if not self.recommendation_llm:
+            return ["Recommendations could not be generated."]
+
+        findings_summary = "\n".join([f"- {item.severity.upper()}: {item.description}" for item in analysis.evidence])
+        
+        prompt = (
+            "You are an AI assistant for investigative journalists. Based on the following document analysis findings, "
+            "provide a numbered list of clear, actionable next steps the journalist should take to further verify the document's authenticity. "
+            f"Findings:\n{findings_summary}"
+        )
+        
+        try:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(lambda: self.recommendation_llm.invoke(prompt))
+                result: RecommendationResponse = future.result()
+            return result.recommendations
+        except Exception as e:
+            logger.error(f"Failed to generate recommendations: {e}")
+            return ["Could not generate recommendations due to an internal error."]
+
 
     def analyze_document(self, doc_id: str) -> Optional[AnalysisResult]:
         """
@@ -85,23 +113,31 @@ class VisionAnalyzer:
                 ]
             )
 
-            if self.structured_llm:
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future = executor.submit(lambda: self.structured_llm.invoke([message]))
-                    result: VisionAnalysis = future.result()
-            else:
-                raise NotImplementedError("Fallback parsing is not a reliable method for this complex structured output and has been removed.")
+            if not self.structured_llm:
+                 raise NotImplementedError("Structured output is required for vision analysis.")
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(lambda: self.structured_llm.invoke([message]))
+                result: VisionAnalysis = future.result()
+            
+            recommendations = self._generate_recommendations(result)
 
             with transaction.atomic():
-                analysis_result = AnalysisResult.objects.create(
+                analysis_result, created = AnalysisResult.objects.update_or_create(
                     doc_id=document,
-                    confidence_score=result.confidence_score,
-                    findings=result.assessment, # Store the main assessment here
-                    provenance_chain={
-                        "model_used": django_settings.GEMINI_MODEL,
-                        "analysis_timestamp": datetime.utcnow().isoformat(),
-                    },
+                    defaults={
+                        'confidence_score': result.confidence_score,
+                        'findings': result.assessment, # Store the main assessment here
+                        'provenance_chain': {
+                            "model_used": django_settings.GEMINI_MODEL,
+                            "analysis_timestamp": datetime.utcnow().isoformat(),
+                        },
+                         'recommendations': {"steps": recommendations} # Save recommendations
+                    }
                 )
+
+                # Clear old anomalies before adding new ones
+                AnomalyDetection.objects.filter(analysis_id=analysis_result).delete()
 
                 for item in result.evidence:
                     AnomalyDetection.objects.create(

@@ -1,4 +1,3 @@
-
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -66,7 +65,7 @@ def health_check(request):
             name='user_email',
             type=str,
             location=OpenApiParameter.QUERY,
-            description='Email of the user performing the analysis (optional, used for tracking)'
+            description='Email of the user performing the analysis (required for tracking)'
         )
     ],
     responses={
@@ -87,107 +86,56 @@ class FileAnalysisView(APIView):
         Returns the analysis results when complete.
         """
         file_obj = request.FILES.get('file')
-        user_email = request.GET.get('user_email', None) # Get email from query params
-        analysis_type = request.POST.get('analysis_type', 'full')  # 'full', 'vision', 'rag'
-        
-        if not file_obj:
-            return JsonResponse({
-                'error': 'No file provided'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Validate file type
-        if file_obj.content_type not in settings.SUPPORTED_FILE_TYPES:
-            return JsonResponse({
-                'error': f'File type {file_obj.content_type} not supported. Supported types: {settings.SUPPORTED_FILE_TYPES}'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Validate file size
-        if file_obj.size > settings.MAX_FILE_SIZE:
-            return JsonResponse({
-                'error': f'File too large. Maximum size is {settings.MAX_FILE_SIZE / (1024*1024):.1f}MB'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Get or create user by email
-        user = None
-        if user_email:
-            try:
-                user, created = User.objects.get_or_create(
-                    email=user_email,
-                    defaults={'full_name': 'Firebase User'} # Default name for new users
-                )
-            except Exception as e:
-                 return JsonResponse({
-                    'error': str(e),
-                    'detail': 'Failed to get or create user in the backend.'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        user_email = request.GET.get('user_email', None)
+        analysis_type = request.POST.get('analysis_type', 'full')
 
-        # Generate document ID
-        doc_id = str(uuid.uuid4())
+        if not file_obj:
+            return JsonResponse({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+        if not user_email:
+            return JsonResponse({'error': 'user_email is a required parameter'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Create storage directory if it doesn't exist
+        if file_obj.content_type not in settings.SUPPORTED_FILE_TYPES:
+            return JsonResponse({'error': f'File type {file_obj.content_type} not supported.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if file_obj.size > settings.MAX_FILE_SIZE:
+            return JsonResponse({'error': f'File too large. Maximum size is {settings.MAX_FILE_SIZE / (1024*1024):.1f}MB'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user, created = User.objects.get_or_create(
+            email=user_email,
+            defaults={'full_name': 'Firebase User'}
+        )
+        if not created:
+            user.usage_count += 1
+            user.save()
+
+        doc_id = str(uuid.uuid4())
         storage_path = Path(settings.STORAGE_PATH)
         storage_path.mkdir(exist_ok=True)
-        
-        # Save file with original extension
         file_extension = Path(file_obj.name).suffix
         normal_filename = f"{doc_id}{file_extension}"
         file_path = storage_path / normal_filename
         
-        # Write the uploaded file to storage
         path = default_storage.save(str(file_path), ContentFile(file_obj.read()))
         
-        # Create document record in database
         try:
             document = Document.objects.create(
                 id=doc_id,
-                user_id=user, # Link the user object
+                user_id=user,
                 filename=file_obj.name,
                 storage_path=str(file_path),
-                status="pending",  # Start with pending status
+                status="pending",
             )
             
-            # Process the document synchronously
-            self._process_and_analyze_file_sync(str(file_path), doc_id, user.id if user else None, analysis_type)
+            # This is now a fully synchronous process
+            self._process_and_analyze_file_sync(str(file_path), doc_id, user.id, analysis_type)
             
-            # Get the latest document state from DB
             document.refresh_from_db()
             
-            # Get the analysis results if they exist
-            analysis_result = AnalysisResult.objects.filter(doc_id=document).order_by('-created_at').first()
-            if analysis_result:
-                # Fetch related evidence (anomalies)
-                evidence = AnomalyDetection.objects.filter(analysis_id=analysis_result)
-                
-                # Structure the response
-                return Response({
-                    'document_id': doc_id,
-                    'filename': file_obj.name,
-                    'status': document.status,
-                    'analysis_result': {
-                        'id': str(analysis_result.id),
-                        'confidence_score': analysis_result.confidence_score,
-                        'assessment': analysis_result.findings,
-                        'evidence': [
-                            {
-                                'type': item.type,
-                                'description': item.location.get('description', ''),
-                                'severity': item.severity,
-                                'confidence': item.confidence
-                            } for item in evidence
-                        ],
-                        'created_at': analysis_result.created_at
-                    }
-                }, status=status.HTTP_200_OK)
-            else:
-                return Response({
-                    'document_id': doc_id,
-                    'filename': file_obj.name,
-                    'status': document.status,
-                    'message': f'Document processed but no analysis completed: {document.status}'
-                }, status=status.HTTP_200_OK)
+            # Delegate response generation to the analysis result view logic
+            return get_analysis_result(request, document_id)
             
         except Exception as e:
-            # Clean up the file if DB insertion fails
+            logger.error(f"Error during file analysis view: {e}", exc_info=True)
             if os.path.exists(str(file_path)):
                 os.remove(str(file_path))
             
@@ -201,25 +149,17 @@ class FileAnalysisView(APIView):
         Internal method to process file and perform requested analysis synchronously.
         """
         try:
-            # First, process the document for text extraction
             process_document_sync(file_path, doc_id, user_id)
             
-            # Get the processed document from the database
             document = Document.objects.get(id=doc_id)
             if document.status == "processed":
-                # Now perform the requested analysis
                 if analysis_type in ['full', 'vision']:
                     vision_analyzer = VisionAnalyzer()
-                    # Run vision analysis
-                    vision_result = vision_analyzer.analyze_document(doc_id)
+                    vision_analyzer.analyze_document(doc_id)
                 
                 if analysis_type in ['full', 'rag'] and document.extracted_text:
                     rag_service = RAGService()
-                    # Run RAG analysis
-                    rag_results = rag_service.analyze_with_context([{
-                        "id": doc_id,
-                        "text": document.extracted_text
-                    }])
+                    rag_service.analyze_with_context([{"id": doc_id, "text": document.extracted_text}])
                 
                 logger.success(f"Completed {analysis_type} analysis for document {doc_id}")
             else:
@@ -227,7 +167,6 @@ class FileAnalysisView(APIView):
                 
         except Exception as e:
             logger.error(f"Error in processing and analysis for document {doc_id}: {str(e)}")
-            # Update document status to failed if document exists
             try:
                 document = Document.objects.get(id=doc_id)
                 document.status = "failed"
@@ -236,155 +175,11 @@ class FileAnalysisView(APIView):
                 pass
 
 
-# Simplified bulk upload endpoint for database population
-@extend_schema(
-    description="Bulk upload files for database population (not for user analysis). This endpoint processes files and adds them to the knowledge base.",
-    request={
-        'multipart/form-data': {
-            'type': 'object',
-            'properties': {
-                'files': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'string',
-                        'format': 'binary'
-                    },
-                    'description': 'Multiple files to be processed and added to the knowledge base'
-                },
-                'doc_type': {
-                    'type': 'string',
-                    'default': 'general',
-                    'description': 'Type of documents being uploaded'
-                },
-                'source': {
-                    'type': 'string',
-                    'default': 'bulk_upload',
-                    'description': 'Source of the documents'
-                }
-            }
-        }
-    },
-    responses={
-        201: OpenApiTypes.OBJECT,
-        400: OpenApiTypes.OBJECT,
-        500: OpenApiTypes.OBJECT
-    }
-)
-@method_decorator(csrf_exempt, name='dispatch')
-class BulkUploadView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        """
-        Bulk upload files for database population (not for user analysis).
-        This endpoint processes files and adds them to the knowledge base.
-        """
-        files = request.FILES.getlist('files')
-        doc_type = request.POST.get('doc_type', 'general')
-        source = request.POST.get('source', 'bulk_upload')
-        
-        if not files:
-            return JsonResponse({
-                'error': 'No files provided'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        doc_ids = []
-        
-        # Create storage directory if it doesn't exist
-        storage_path = Path(settings.STORAGE_PATH)
-        storage_path.mkdir(exist_ok=True)
-        
-        # Validate and process files
-        for file in files:
-            # Validate file type
-            if file.content_type not in settings.SUPPORTED_FILE_TYPES:
-                return JsonResponse({
-                    'error': f"File type {file.content_type} not supported. Supported types: {settings.SUPPORTED_FILE_TYPES}"
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Validate file size
-            if file.size > settings.MAX_FILE_SIZE:
-                return JsonResponse({
-                    'error': f"File {file.name} too large. Maximum size is {settings.MAX_FILE_SIZE / (1024*1024):.1f}MB"
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Generate document ID
-            doc_id = str(uuid.uuid4())
-            doc_ids.append(doc_id)
-            
-            # Save file with original extension
-            file_extension = Path(file.name).suffix
-            normal_filename = f"{doc_id}{file_extension}"
-            file_path = storage_path / normal_filename
-            
-            # Write the uploaded file to storage
-            path = default_storage.save(str(file_path), ContentFile(file.read()))
-            
-            # Create document record in database
-            try:
-                document = Document.objects.create(
-                    id=doc_id,
-                    filename=file.name,
-                    storage_path=str(file_path),
-                    status="pending",  # Start with pending status
-                )
-                
-                # Process and add to knowledge base synchronously
-                self._process_and_add_to_knowledge_base_sync(str(file_path), doc_id, doc_type, source)
-                
-            except Exception as e:
-                # Clean up the file if DB insertion fails
-                if os.path.exists(str(file_path)):
-                    os.remove(str(file_path))
-                return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        return Response({
-            'message': f"Successfully processed {len(files)} documents for knowledge base as type '{doc_type}'",
-            'document_count': len(files),
-            'document_ids': doc_ids
-        }, status=status.HTTP_201_CREATED)
-    
-    def _process_and_add_to_knowledge_base_sync(self, file_path: str, doc_id: str, doc_type: str, source: str):
-        """
-        Internal function to process a document and add its content to the knowledge base synchronously.
-        """
-        # First, process the document using the standard processor
-        process_document_sync(file_path, doc_id, None)  # No user_id for bulk uploads
-        
-        # Then extract the processed text and add to knowledge base
-        try:
-            # Get the processed document from the database
-            document = Document.objects.get(id=doc_id)
-            if not document:
-                logger.error(f"Document {doc_id} not found after processing")
-                return
-            
-            if document.status != "processed" or not document.extracted_text:
-                logger.warning(f"Document {doc_id} not properly processed")
-                return
-            
-            # Add to knowledge base
-            rag_service = RAGService()
-            rag_service.add_to_knowledge_base(
-                [document.extracted_text],  # Add the extracted text to knowledge base
-                doc_type,
-                source=source
-            )
-            
-            logger.success(f"Successfully added document {doc_id} to knowledge base")
-            
-        except Document.DoesNotExist:
-            logger.error(f"Document {doc_id} does not exist")
-        except Exception as e:
-            logger.error(f"Error adding document {doc_id} to knowledge base: {str(e)}")
-
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_analysis_result(request, document_id):
     """
-    Get the analysis result for a processed document.
+    Get the analysis result for a processed document, including metadata and recommendations.
     """
     try:
         document = Document.objects.get(id=document_id)
@@ -394,8 +189,11 @@ def get_analysis_result(request, document_id):
     try:
         analysis_result = AnalysisResult.objects.filter(doc_id=document).order_by('-created_at').first()
         if analysis_result:
-            evidence = AnomalyDetection.objects.filter(analysis_id=analysis_result)
-            return Response({
+            evidence_items = AnomalyDetection.objects.filter(analysis_id=analysis_result)
+            metadata_obj = DocumentMetadata.objects.filter(doc_id=document).first()
+            
+            # Build the rich response object
+            response_data = {
                 'document_id': document.id,
                 'filename': document.filename,
                 'status': document.status,
@@ -403,33 +201,45 @@ def get_analysis_result(request, document_id):
                     'id': str(analysis_result.id),
                     'confidence_score': analysis_result.confidence_score,
                     'assessment': analysis_result.findings,
+                    'recommendations': analysis_result.recommendations.get('steps', []),
                     'evidence': [
                         {
                             'type': item.type,
                             'description': item.location.get('description', ''),
                             'severity': item.severity,
                             'confidence': item.confidence
-                        } for item in evidence
+                        } for item in evidence_items
                     ],
-                    'created_at': analysis_result.created_at
-                }
-            }, status=status.HTTP_200_OK)
-        else:
-            status_progress_map = {
-                "pending": 10, "processing": 50, "processed": 100, "failed": 100
+                    'created_at': analysis_result.created_at.isoformat()
+                },
+                'metadata': None
             }
-            progress = status_progress_map.get(document.status, 0)
+            if metadata_obj:
+                response_data['metadata'] = {
+                    'filename': document.filename,
+                    'size_bytes': metadata_obj.size,
+                    'type': metadata_obj.file_type,
+                    'pages': metadata_obj.page_count,
+                    'created': metadata_obj.creation_date.isoformat() if metadata_obj.creation_date else None,
+                    'modified': metadata_obj.modified_date.isoformat() if metadata_obj.modified_date else None,
+                    'author': metadata_obj.author,
+                    'creator_tool': metadata_obj.creator_tool,
+                    'producer': metadata_obj.producer,
+                }
             
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            status_progress_map = {"pending": 10, "processing": 50, "processed": 100, "failed": 100}
             return Response({
                 'document_id': document.id,
                 'status': document.status,
-                'progress': progress,
+                'progress': status_progress_map.get(document.status, 0),
                 'message': f'Document is {document.status}, analysis not yet completed'
             }, status=status.HTTP_200_OK)
+            
     except Exception as e:
-        return Response({
-            'error': f'Error retrieving analysis: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logger.error(f"Error retrieving analysis for doc {document_id}: {e}", exc_info=True)
+        return Response({'error': f'Error retrieving analysis: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['GET'])
@@ -473,7 +283,6 @@ def get_user_documents(request):
         return Response(results)
 
     except User.DoesNotExist:
-        # Return an empty list if the user is not found, which is a valid case for new users
         return Response([], status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
