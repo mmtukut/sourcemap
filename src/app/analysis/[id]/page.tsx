@@ -1,4 +1,3 @@
-
 'use client';
 import { useEffect, useState } from 'react';
 import { ConfidenceScore } from '@/components/analysis/confidence-score';
@@ -12,7 +11,6 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
-import { generateRecommendations, GenerateRecommendationsOutput } from '@/ai/flows/generate-recommendations';
 import { useParams } from 'next/navigation';
 
 const API_BASE_URL = '/api/v1';
@@ -24,6 +22,18 @@ type EvidenceItem = {
     confidence: number;
 };
 
+type Metadata = {
+    filename: string;
+    size_bytes: number;
+    type: string;
+    pages?: number;
+    created?: string;
+    modified?: string;
+    author?: string;
+    creator_tool?: string;
+    producer?: string;
+};
+
 type BackendAnalysisResult = {
   document_id: string;
   filename: string;
@@ -33,42 +43,18 @@ type BackendAnalysisResult = {
     confidence_score: number;
     assessment: string;
     evidence: EvidenceItem[];
+    recommendations: string[];
     created_at: string;
   };
+  metadata?: Metadata;
   message?: string;
-};
-
-type AdaptedAnalysisOutput = {
-  confidenceScore: number;
-  status: 'clear' | 'review' | 'flag';
-  keyFindings: EvidenceItem[]; 
-  metadataAnalysis: {
-    filename: string;
-    size: string;
-    type: string;
-    pages?: number;
-    created?: string;
-    modified?: string;
-    author?: string;
-    creatorTool?: string;
-    authenticityChecks: string[]; 
-  };
-  similarDocuments: Array<{
-    filename: string;
-    similarity: number;
-    type: string;
-    status: string;
-    keyDifferences: string[];
-    assessment: string;
-  }>;
 };
 
 export default function AnalysisResultPage() {
   const params = useParams();
   const id = params?.id as string;
 
-  const [analysisData, setAnalysisData] = useState<AdaptedAnalysisOutput | null>(null);
-  const [recommendations, setRecommendations] = useState<GenerateRecommendationsOutput | null>(null);
+  const [backendData, setBackendData] = useState<BackendAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
@@ -89,12 +75,11 @@ export default function AnalysisResultPage() {
 
         const result: BackendAnalysisResult = await res.json();
         
-        const analysisResult = result.analysis_result;
-
-        if (!analysisResult) {
+        if (!result.analysis_result) {
             throw new Error(result.message || "Analysis is not yet complete.");
         }
         
+<<<<<<< HEAD
         const score = analysisResult.confidence_score; 
         const evidenceList = analysisResult.evidence || []; // Default to empty array
 
@@ -130,6 +115,9 @@ export default function AnalysisResultPage() {
             // Set a default state for recommendations so the page can still render
             setRecommendations({ recommendations: ['AI recommendations are currently unavailable. Please check back later.'] });
         }
+=======
+        setBackendData(result);
+>>>>>>> 2b67af905ccceb49570e9e3fcc8b18db27f4241c
 
       } catch (e) {
          setError((e as Error).message || 'Failed to fetch analysis data.');
@@ -175,7 +163,7 @@ export default function AnalysisResultPage() {
     );
   }
   
-  if (!analysisData || !recommendations) {
+  if (!backendData || !backendData.analysis_result) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center">
           <h2 className="text-xl font-semibold text-destructive mb-2">Analysis Incomplete</h2>
@@ -188,13 +176,28 @@ export default function AnalysisResultPage() {
   }
 
 
-  const { confidenceScore, status, keyFindings, metadataAnalysis, similarDocuments } = analysisData;
+  const { analysis_result, metadata, filename } = backendData;
+  const { confidence_score, evidence, recommendations } = analysis_result;
+  const score = confidence_score;
+  const status = score >= 80 ? 'clear' : score >= 60 ? 'review' : 'flag';
 
-  const evidencePanelFindings = keyFindings.map(item => ({
+  const evidencePanelFindings = (evidence || []).map(item => ({
     type: item.severity, 
     description: item.description,
     evidence: `Confidence: ${(item.confidence * 100).toFixed(0)}%`
   }));
+
+  const adaptedMetadata = {
+      filename: filename,
+      size: metadata?.size_bytes ? `${(metadata.size_bytes / 1024).toFixed(2)} KB` : 'N/A',
+      type: metadata?.type || 'N/A',
+      pages: metadata?.pages,
+      created: metadata?.created,
+      modified: metadata?.modified,
+      author: metadata?.author,
+      creatorTool: metadata?.creator_tool,
+      authenticityChecks: (evidence || []).map(e => e.description),
+  };
 
   return (
     <div className="space-y-8">
@@ -206,11 +209,11 @@ export default function AnalysisResultPage() {
           </Link>
         </Button>
         <h1 className="text-3xl font-bold font-headline tracking-tight mt-2">
-          Analysis for: {metadataAnalysis.filename || 'document'}
+          Analysis for: {filename || 'document'}
         </h1>
       </div>
 
-      <ConfidenceScore score={confidenceScore} status={status} />
+      <ConfidenceScore score={score} status={status} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
         <div className="lg:col-span-3">
@@ -222,9 +225,9 @@ export default function AnalysisResultPage() {
       </div>
       
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <AnalysisTabs metadataAnalysis={metadataAnalysis} similarDocuments={similarDocuments} />
+        <AnalysisTabs metadataAnalysis={adaptedMetadata} similarDocuments={[]} />
         <div className="space-y-8">
-            <Recommendations recommendations={recommendations.recommendations} />
+            <Recommendations recommendations={recommendations || []} />
             <Feedback />
         </div>
       </div>

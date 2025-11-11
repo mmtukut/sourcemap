@@ -1,4 +1,3 @@
-
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -40,6 +39,71 @@ def health_check(request):
     return Response({"status": "ok", "message": "SourceMap Backend is running"}, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    description="Retrieve a list of documents for a specific user, identified by email.",
+    parameters=[
+        OpenApiParameter(
+            name='user_email',
+            type=str,
+            location=OpenApiParameter.QUERY,
+            required=True,
+            description='Email of the user whose documents are to be retrieved.'
+        )
+    ],
+    responses={
+        200: OpenApiTypes.OBJECT,
+        400: OpenApiTypes.OBJECT,
+        404: OpenApiTypes.OBJECT
+    }
+)
+class DocumentListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        user_email = request.query_params.get('user_email')
+        if not user_email:
+            return Response({'error': 'user_email query parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            # If user does not exist, they have no documents. Return empty list.
+            return Response([], status=status.HTTP_200_OK)
+
+        documents = Document.objects.filter(user_id=user).order_by('-created_at')
+        
+        # Prepare data in the format expected by the frontend
+        results = []
+        for doc in documents:
+            # Attempt to get the latest analysis for this document
+            latest_analysis = AnalysisResult.objects.filter(doc_id=doc).order_by('-created_at').first()
+            
+            score = None
+            if latest_analysis:
+                score = latest_analysis.confidence_score
+            
+            # Determine status based on score or document status
+            doc_status = doc.status
+            if doc.status == 'processed' and score is not None:
+                if score >= 80:
+                    doc_status = 'clear'
+                elif score >= 60:
+                    doc_status = 'review'
+                else:
+                    doc_status = 'flag'
+
+            results.append({
+                'id': doc.id,
+                'name': doc.filename,
+                'status': doc_status,
+                'score': score,
+                'date': doc.created_at.strftime('%b %d, %Y')
+            })
+            
+        return Response(results, status=status.HTTP_200_OK)
+
+
+
 # Simplified user analysis endpoint - combines upload, processing, and analysis
 @extend_schema(
     description="Upload a file for user analysis. This endpoint handles upload, processing, and analysis synchronously. Returns the analysis results when complete.",
@@ -63,10 +127,10 @@ def health_check(request):
     },
     parameters=[
         OpenApiParameter(
-            name='user_email',
+            name='user_id',
             type=str,
             location=OpenApiParameter.QUERY,
-            description='Email of the user performing the analysis (optional, used for tracking)'
+            description='ID of the user performing the analysis (optional)'
         )
     ],
     responses={
@@ -87,7 +151,7 @@ class FileAnalysisView(APIView):
         Returns the analysis results when complete.
         """
         file_obj = request.FILES.get('file')
-        user_email = request.GET.get('user_email', None) # Get email from query params
+        user_id = request.GET.get('user_id', None)
         analysis_type = request.POST.get('analysis_type', 'full')  # 'full', 'vision', 'rag'
         
         if not file_obj:
@@ -107,20 +171,6 @@ class FileAnalysisView(APIView):
                 'error': f'File too large. Maximum size is {settings.MAX_FILE_SIZE / (1024*1024):.1f}MB'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        # Get or create user by email
-        user = None
-        if user_email:
-            try:
-                user, created = User.objects.get_or_create(
-                    email=user_email,
-                    defaults={'full_name': 'Firebase User'} # Default name for new users
-                )
-            except Exception as e:
-                 return JsonResponse({
-                    'error': str(e),
-                    'detail': 'Failed to get or create user in the backend.'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
         # Generate document ID
         doc_id = str(uuid.uuid4())
         
@@ -140,42 +190,32 @@ class FileAnalysisView(APIView):
         try:
             document = Document.objects.create(
                 id=doc_id,
-                user_id=user, # Link the user object
+                user_id_id=user_id,  # Assuming user_id is stored directly in the model
                 filename=file_obj.name,
                 storage_path=str(file_path),
                 status="pending",  # Start with pending status
             )
             
             # Process the document synchronously
-            self._process_and_analyze_file_sync(str(file_path), doc_id, user.id if user else None, analysis_type)
+            self._process_and_analyze_file_sync(str(file_path), doc_id, user_id, analysis_type)
             
             # Get the latest document state from DB
             document.refresh_from_db()
             
             # Get the analysis results if they exist
-            analysis_result = AnalysisResult.objects.filter(doc_id=document).order_by('-created_at').first()
-            if analysis_result:
-                # Fetch related evidence (anomalies)
-                evidence = AnomalyDetection.objects.filter(analysis_id=analysis_result)
-                
-                # Structure the response
+            analysis_results = AnalysisResult.objects.filter(doc_id=document)
+            if analysis_results.exists():
+                latest_analysis = analysis_results.latest('created_at')
                 return Response({
                     'document_id': doc_id,
                     'filename': file_obj.name,
                     'status': document.status,
                     'analysis_result': {
-                        'id': str(analysis_result.id),
-                        'confidence_score': analysis_result.confidence_score,
-                        'assessment': analysis_result.findings,
-                        'evidence': [
-                            {
-                                'type': item.type,
-                                'description': item.location.get('description', ''),
-                                'severity': item.severity,
-                                'confidence': item.confidence
-                            } for item in evidence
-                        ],
-                        'created_at': analysis_result.created_at
+                        'id': latest_analysis.id,
+                        'confidence_score': latest_analysis.confidence_score,
+                        'sub_scores': latest_analysis.sub_scores,
+                        'findings': latest_analysis.findings,
+                        'created_at': latest_analysis.created_at
                     }
                 }, status=status.HTTP_200_OK)
             else:
@@ -192,8 +232,7 @@ class FileAnalysisView(APIView):
                 os.remove(str(file_path))
             
             return JsonResponse({
-                'error': str(e),
-                'detail': 'An internal error occurred while saving the document or running analysis.'
+                'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     def _process_and_analyze_file_sync(self, file_path, doc_id, user_id, analysis_type):
@@ -391,32 +430,30 @@ def get_analysis_result(request, document_id):
     except Document.DoesNotExist:
         return Response({'error': 'Document not found'}, status=status.HTTP_404_NOT_FOUND)
     
+    # Get the analysis results if they exist
     try:
-        analysis_result = AnalysisResult.objects.filter(doc_id=document).order_by('-created_at').first()
-        if analysis_result:
-            evidence = AnomalyDetection.objects.filter(analysis_id=analysis_result)
+        analysis_results = AnalysisResult.objects.filter(doc_id=document)
+        if analysis_results.exists():
+            # Return the latest analysis result
+            latest_analysis = analysis_results.latest('created_at')
             return Response({
                 'document_id': document.id,
-                'filename': document.filename,
                 'status': document.status,
                 'analysis_result': {
-                    'id': str(analysis_result.id),
-                    'confidence_score': analysis_result.confidence_score,
-                    'assessment': analysis_result.findings,
-                    'evidence': [
-                        {
-                            'type': item.type,
-                            'description': item.location.get('description', ''),
-                            'severity': item.severity,
-                            'confidence': item.confidence
-                        } for item in evidence
-                    ],
-                    'created_at': analysis_result.created_at
+                    'id': latest_analysis.id,
+                    'confidence_score': latest_analysis.confidence_score,
+                    'sub_scores': latest_analysis.sub_scores,
+                    'findings': latest_analysis.findings,
+                    'created_at': latest_analysis.created_at
                 }
             }, status=status.HTTP_200_OK)
         else:
+            # Return document status if no analysis completed yet
             status_progress_map = {
-                "pending": 10, "processing": 50, "processed": 100, "failed": 100
+                "pending": 10,
+                "processing": 50,
+                "processed": 100,
+                "failed": 100
             }
             progress = status_progress_map.get(document.status, 0)
             
@@ -430,50 +467,3 @@ def get_analysis_result(request, document_id):
         return Response({
             'error': f'Error retrieving analysis: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def get_user_documents(request):
-    """
-    Get a list of documents for a specific user.
-    """
-    user_email = request.GET.get('user_email', None)
-    if not user_email:
-        return Response({'error': 'user_email parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        user = User.objects.get(email=user_email)
-        documents = Document.objects.filter(user_id=user).order_by('-created_at')
-        
-        results = []
-        for doc in documents:
-            latest_analysis = AnalysisResult.objects.filter(doc_id=doc).order_by('-created_at').first()
-            doc_data = {
-                'id': doc.id,
-                'name': doc.filename,
-                'date': doc.created_at.strftime('%b %d, %Y'),
-                'status': 'processed',
-                'score': None
-            }
-            if latest_analysis:
-                score = latest_analysis.confidence_score
-                if score >= 80:
-                    doc_data['status'] = 'clear'
-                elif score >= 60:
-                    doc_data['status'] = 'review'
-                else:
-                    doc_data['status'] = 'flag'
-                doc_data['score'] = score
-            else:
-                doc_data['status'] = doc.status
-
-            results.append(doc_data)
-
-        return Response(results)
-
-    except User.DoesNotExist:
-        # Return an empty list if the user is not found, which is a valid case for new users
-        return Response([], status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

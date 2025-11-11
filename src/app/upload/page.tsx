@@ -79,7 +79,7 @@ export default function UploadPage() {
 
     try {
         const xhr = new XMLHttpRequest();
-        const url = new URL(`${window.location.origin}${API_BASE_URL}/analyze-file`);
+        const url = new URL(`${window.location.origin}${API_BASE_URL}/analyze-file/`);
         // The backend now uses email to find/create the user.
         if (user.email) {
           url.searchParams.append('user_email', user.email);
