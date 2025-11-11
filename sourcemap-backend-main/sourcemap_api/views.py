@@ -129,10 +129,8 @@ class FileAnalysisView(APIView):
             # This is now a fully synchronous process
             self._process_and_analyze_file_sync(str(file_path), doc_id, user.id, analysis_type)
             
-            document.refresh_from_db()
-            
             # Delegate response generation to the analysis result view logic
-            return get_analysis_result(request, document_id)
+            return get_analysis_result(request, doc_id)
             
         except Exception as e:
             logger.error(f"Error during file analysis view: {e}", exc_info=True)
@@ -260,7 +258,7 @@ def get_user_documents(request):
         for doc in documents:
             latest_analysis = AnalysisResult.objects.filter(doc_id=doc).order_by('-created_at').first()
             doc_data = {
-                'id': doc.id,
+                'id': str(doc.id),
                 'name': doc.filename,
                 'date': doc.created_at.strftime('%b %d, %Y'),
                 'status': 'processed',
