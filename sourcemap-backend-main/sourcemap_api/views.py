@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
@@ -13,7 +13,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
-from .models import User, Document, DocumentMetadata, AnalysisResult, AnomalyDetection, KnowledgeDocument, SimilarDocument, AuditLog
+from .models import User, Document, DocumentMetadata, AnalysisResult, AnomalyDetection
 from .serializers import UserSerializer, DocumentSerializer, AnalysisResultSerializer
 from django.conf import settings
 from .document_processor import process_document_sync
@@ -284,3 +284,4 @@ def get_user_documents(request):
         return Response([], status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
