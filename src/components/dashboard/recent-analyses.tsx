@@ -17,7 +17,7 @@ import { useUser } from '@/firebase';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
 
 type Analysis = {
   id: string;

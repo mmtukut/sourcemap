@@ -5,7 +5,7 @@ import { FileCheck, FileClock, CircleDollarSign, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/firebase';
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
 
 type Stat = {
     title: string;

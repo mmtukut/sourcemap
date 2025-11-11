@@ -1,3 +1,4 @@
+
 'use client';
 import { useEffect, useState } from 'react';
 import { ConfidenceScore } from '@/components/analysis/confidence-score';
@@ -13,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { useParams } from 'next/navigation';
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
 
 type EvidenceItem = {
     type: string;
@@ -79,45 +80,7 @@ export default function AnalysisResultPage() {
             throw new Error(result.message || "Analysis is not yet complete.");
         }
         
-<<<<<<< HEAD
-        const score = analysisResult.confidence_score; 
-        const evidenceList = analysisResult.evidence || []; // Default to empty array
-
-        // Adapt the new structured backend response to the frontend's expected format
-        const adaptedResult: AdaptedAnalysisOutput = {
-            confidenceScore: score,
-            status: score >= 80 ? 'clear' : score >= 60 ? 'review' : 'flag',
-            keyFindings: evidenceList, // Use the safe evidenceList
-            metadataAnalysis: { 
-                filename: result.filename, 
-                size: 'N/A',
-                type: 'N/A',
-                created: analysisResult.created_at,
-                authenticityChecks: evidenceList.map(e => e.description),
-            },
-            similarDocuments: [] 
-        };
-
-        setAnalysisData(adaptedResult);
-
-        // Generate recommendations, but handle potential failures gracefully
-        try {
-            const recommendationInput = JSON.stringify(adaptedResult.keyFindings.map(f => f.description));
-            const recommendationsResponse = await generateRecommendations({ analysisResults: recommendationInput });
-            setRecommendations(recommendationsResponse);
-        } catch (recError) {
-            console.error("Failed to generate recommendations:", recError);
-            toast({
-              variant: 'destructive',
-              title: 'Could Not Load AI Recommendations',
-              description: 'The AI service may be temporarily unavailable. The main analysis is still shown.',
-            });
-            // Set a default state for recommendations so the page can still render
-            setRecommendations({ recommendations: ['AI recommendations are currently unavailable. Please check back later.'] });
-        }
-=======
         setBackendData(result);
->>>>>>> 2b67af905ccceb49570e9e3fcc8b18db27f4241c
 
       } catch (e) {
          setError((e as Error).message || 'Failed to fetch analysis data.');

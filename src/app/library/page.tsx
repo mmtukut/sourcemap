@@ -18,7 +18,7 @@ import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
 
 const initialAnalyses = [
   { name: 'Contract_001.pdf', status: 'clear', score: 87, date: 'Oct 30, 2024', id: '1' },
@@ -148,4 +148,3 @@ export default function LibraryPage() {
     </div>
   );
 }
-

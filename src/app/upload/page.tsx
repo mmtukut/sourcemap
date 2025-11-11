@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/firebase';
 
 
-const API_BASE_URL = '/api/v1'; 
+const API_BASE_URL = 'http://151.241.100.160:9000/api/v1'; 
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -79,8 +79,7 @@ export default function UploadPage() {
 
     try {
         const xhr = new XMLHttpRequest();
-        const url = new URL(`${window.location.origin}${API_BASE_URL}/analyze-file/`);
-        // The backend now uses email to find/create the user.
+        const url = new URL(`${API_BASE_URL}/analyze-file`);
         if (user.email) {
           url.searchParams.append('user_email', user.email);
         }
@@ -112,7 +111,6 @@ export default function UploadPage() {
                  try {
                    errorData = JSON.parse(xhr.responseText || '{}');
                  } catch (e) {
-                    // This means the response was not JSON, likely an HTML error page
                     if (xhr.responseText.toLowerCase().includes('internal server error') || xhr.responseText.toLowerCase().includes('traceback')) {
                         throw new Error('A critical error occurred on the server. Please contact support.');
                     } else {
