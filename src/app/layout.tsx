@@ -70,9 +70,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const iconUrl = "https://firebasestorage.googleapis.com/v0/b/studio-4130837467-4b1cf.firebasestorage.app/o/icon_sourcemap.jpg?alt=media&token=2a540464-335f-426d-a6cd-4fec9904d464";
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href={iconUrl} sizes="any" />
+        <link rel="apple-touch-icon" href={iconUrl} />
+        <meta property="og:image" content={iconUrl} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
