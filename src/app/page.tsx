@@ -1,22 +1,23 @@
-
-'use client';
-import { useUser } from '@/firebase';
-import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
+import { LandingHeader } from '@/components/landing/landing-header';
+import { Hero } from '@/components/landing/hero';
+import { HowItWorks } from '@/components/landing/how-it-works';
+import { ProblemSolution } from '@/components/landing/problem-solution';
+import { Testimonials } from '@/components/landing/testimonials';
+import { TrustAndCta } from '@/components/landing/trust-cta';
+import { LandingFooter } from '@/components/landing/landing-footer';
 
 export default function RootPage() {
-    const { user, isUserLoading } = useUser();
-
-    useEffect(() => {
-        if (!isUserLoading) {
-            if (user) {
-                redirect('/dashboard');
-            } else {
-                redirect('/landing');
-            }
-        }
-    }, [user, isUserLoading]);
-
-    // You can return a loader here while waiting for the user state
-    return null;
+  return (
+    <>
+      <LandingHeader />
+      <main>
+        <Hero />
+        <HowItWorks />
+        <ProblemSolution />
+        <Testimonials />
+        <TrustAndCta />
+      </main>
+      <LandingFooter />
+    </>
+  );
 }
