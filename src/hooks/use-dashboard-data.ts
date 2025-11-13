@@ -38,7 +38,7 @@ export const DashboardDataProvider = ({ children }: { children: ReactNode }) => 
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
+        const res = await fetch(`${API_BASE_URL}/documents?user_email=${encodeURIComponent(user.email!)}`);
         if (!res.ok) {
            const errorMessage = `Could not load dashboard data (Status: ${res.status}). Please ensure the backend is running.`;
            throw new Error(errorMessage);
