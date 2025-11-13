@@ -13,7 +13,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useDashboardData, type Analysis } from '@/hooks/use-dashboard-data';
+import type { Analysis } from '@/hooks/use-dashboard-data';
+
+interface RecentAnalysesProps {
+    analyses: Analysis[];
+    isLoading: boolean;
+    error: string | null;
+}
 
 const statusStyles: { [key in Analysis['status']]: string } = {
   clear: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 border-green-400',
@@ -24,8 +30,7 @@ const statusStyles: { [key in Analysis['status']]: string } = {
   failed: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-red-400',
 };
 
-export function RecentAnalyses() {
-  const { analyses, isLoading, error } = useDashboardData();
+export function RecentAnalyses({ analyses, isLoading, error }: RecentAnalysesProps) {
 
   return (
     <Card className="glass-card">

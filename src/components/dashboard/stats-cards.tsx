@@ -2,7 +2,13 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileCheck, FileClock, CircleDollarSign, Loader2 } from 'lucide-react';
-import { useDashboardData } from '@/hooks/use-dashboard-data';
+import type { Analysis } from '@/hooks/use-dashboard-data';
+
+interface StatsCardsProps {
+    analyses: Analysis[];
+    isLoading: boolean;
+    error: string | null;
+}
 
 type Stat = {
     title: string;
@@ -40,9 +46,7 @@ const initialStats: Stat[] = [
   },
 ];
 
-export function StatsCards() {
-    const { analyses, isLoading, error } = useDashboardData();
-
+export function StatsCards({ analyses, isLoading, error }: StatsCardsProps) {
     const stats: Stat[] = initialStats.map(stat => {
         if (isLoading) return stat;
         if (error) {
