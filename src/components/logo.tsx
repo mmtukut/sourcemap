@@ -17,7 +17,7 @@ export function Logo({ className }: { className?: string }) {
         alt="SourceMap Logo"
         width={140}
         height={40}
-        className="h-10 w-auto"
+        style={{ height: 'auto', width: 'auto' }}
         priority
       />
     </div>
