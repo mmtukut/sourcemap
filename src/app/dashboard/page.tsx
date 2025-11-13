@@ -7,7 +7,7 @@ import { StatsCards } from '@/components/dashboard/stats-cards';
 import { useUser } from '@/firebase';
 import { DashboardDataProvider } from '@/hooks/use-dashboard-data';
 
-function DashboardContent() {
+export default function DashboardPage() {
   const { user } = useUser();
 
   const getFirstName = () => {
@@ -18,27 +18,21 @@ function DashboardContent() {
   };
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-3xl font-bold font-headline tracking-tight">
-        Welcome Back, {getFirstName()}
-      </h1>
-      <StatsCards />
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <RecentAnalyses />
-        </div>
-        <div>
-          <QuickUpload />
+    <DashboardDataProvider>
+      <div className="space-y-8">
+        <h1 className="text-3xl font-bold font-headline tracking-tight">
+          Welcome Back, {getFirstName()}
+        </h1>
+        <StatsCards />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <RecentAnalyses />
+          </div>
+          <div>
+            <QuickUpload />
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <DashboardDataProvider>
-      <DashboardContent />
     </DashboardDataProvider>
   );
 }
