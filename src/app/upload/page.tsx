@@ -11,9 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from '@/firebase';
-
-
-const API_BASE_URL = 'http://151.241.100.160:9000/api/v1'; 
+import { API_BASE_URL } from '@/lib/api';
 
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);

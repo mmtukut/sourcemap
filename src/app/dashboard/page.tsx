@@ -5,8 +5,9 @@ import { QuickUpload } from '@/components/dashboard/quick-upload';
 import { RecentAnalyses } from '@/components/dashboard/recent-analyses';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { useUser } from '@/firebase';
+import { DashboardDataProvider } from '@/hooks/use-dashboard-data';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user } = useUser();
 
   const getFirstName = () => {
@@ -15,7 +16,6 @@ export default function DashboardPage() {
     }
     return 'User';
   };
-
 
   return (
     <div className="space-y-8">
@@ -32,5 +32,13 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <DashboardDataProvider>
+      <DashboardContent />
+    </DashboardDataProvider>
   );
 }

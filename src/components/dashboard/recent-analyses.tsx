@@ -13,21 +13,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useUser } from '@/firebase';
-import { useEffect, useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useDashboardData, type Analysis } from '@/hooks/use-dashboard-data';
 
-const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
-
-type Analysis = {
-  id: string;
-  name: string;
-  status: 'clear' | 'review' | 'flag' | 'processing' | 'pending' | 'failed';
-  score: number | null;
-  date: string;
-};
-
-const statusStyles = {
+const statusStyles: { [key in Analysis['status']]: string } = {
   clear: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 border-green-400',
   review: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200 border-yellow-400',
   flag: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200 border-red-400',
@@ -37,46 +25,7 @@ const statusStyles = {
 };
 
 export function RecentAnalyses() {
-  const { user } = useUser();
-  const [analyses, setAnalyses] = useState<Analysis[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user?.email) {
-        setIsLoading(false);
-        return;
-    };
-
-    const fetchAnalyses = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
-        if (!res.ok) {
-           const errorMessage = `Could not load recent analyses (Status: ${res.status}). Please ensure the backend is running.`;
-           throw new Error(errorMessage);
-        }
-        const data = await res.json();
-        setAnalyses(data);
-      } catch (error) {
-        const errorMessage = (error as Error).message.includes('fetch') 
-          ? "Could not connect to the backend server. Please ensure it's running."
-          : (error as Error).message;
-        setError(errorMessage);
-        toast({
-          variant: 'destructive',
-          title: 'Error Loading Analyses',
-          description: errorMessage,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAnalyses();
-  }, [user, toast]);
+  const { analyses, isLoading, error } = useDashboardData();
 
   return (
     <Card className="glass-card">

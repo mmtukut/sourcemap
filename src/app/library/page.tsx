@@ -16,9 +16,7 @@ import { Search, ListFilter, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-
-
-const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
+import { API_BASE_URL } from '@/lib/api';
 
 const initialAnalyses = [
   { name: 'Contract_001.pdf', status: 'clear', score: 87, date: 'Oct 30, 2024', id: '1' },

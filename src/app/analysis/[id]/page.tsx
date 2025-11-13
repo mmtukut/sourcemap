@@ -13,8 +13,7 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { useParams } from 'next/navigation';
-
-const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
+import { API_BASE_URL } from '@/lib/api';
 
 type EvidenceItem = {
     type: string;

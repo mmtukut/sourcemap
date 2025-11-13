@@ -2,10 +2,7 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileCheck, FileClock, CircleDollarSign, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useUser } from '@/firebase';
-
-const API_BASE_URL = 'http://151.241.100.160:9000/api/v1';
+import { useDashboardData } from '@/hooks/use-dashboard-data';
 
 type Stat = {
     title: string;
@@ -44,49 +41,26 @@ const initialStats: Stat[] = [
 ];
 
 export function StatsCards() {
-    const [stats, setStats] = useState(initialStats);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const { user } = useUser();
+    const { analyses, isLoading, error } = useDashboardData();
 
-    useEffect(() => {
-        if (!user?.email) {
-            setLoading(false);
-            return;
-        }
-        
-        const fetchStats = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const res = await fetch(`${API_BASE_URL}/documents?user_email=${user.email}`);
-                if(res.ok) {
-                    const data = await res.json();
-                    const analysesThisMonth = data.length; // Simplified for now
-                    const pendingDocs = data.filter((d: any) => d.status === 'pending' || d.status === 'processing').length;
-                    
-                    setStats(prev => prev.map(s => {
-                        if (s.id === 'analyses') return {...s, value: `${analysesThisMonth}`};
-                        if (s.id === 'pending') return {...s, value: `${pendingDocs}`};
-                        return s;
-                    }));
-                } else {
-                     const errorMessage = `Failed to fetch stats: ${res.status} ${res.statusText || ''}`.trim();
-                     setError(errorMessage);
-                     console.error(errorMessage);
-                     setStats(prev => prev.map(s => (s.id === 'analyses' || s.id === 'pending') ? {...s, value: `N/A`} : s));
-                }
-            } catch (error) {
-                const errorMessage = "Could not connect to the backend server. Please ensure it's running.";
-                console.error("Failed to fetch usage stats", error);
-                setError(errorMessage);
-                 setStats(prev => prev.map(s => (s.id === 'analyses' || s.id === 'pending') ? {...s, value: `N/A`} : s));
-            } finally {
-                setLoading(false);
+    const stats: Stat[] = initialStats.map(stat => {
+        if (isLoading) return stat;
+        if (error) {
+            if (stat.id === 'analyses' || stat.id === 'pending') {
+                return { ...stat, value: 'N/A' };
             }
-        };
-        fetchStats();
-    }, [user]);
+            return stat;
+        }
+
+        if (stat.id === 'analyses') {
+            return { ...stat, value: `${analyses.length}` };
+        }
+        if (stat.id === 'pending') {
+            const pendingDocs = analyses.filter(d => d.status === 'pending' || d.status === 'processing').length;
+            return { ...stat, value: `${pendingDocs}` };
+        }
+        return stat;
+    });
 
   return (
     <div>
@@ -98,7 +72,7 @@ export function StatsCards() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                 <div className={`flex h-10 w-10 items-center justify-center rounded-full ${stat.bgColor}`}>
-                    {loading && (stat.id === 'analyses' || stat.id === 'pending') ? <Loader2 className="h-5 w-5 animate-spin" /> : <stat.icon className={`h-5 w-5 ${stat.color}`} />}
+                    {isLoading && (stat.id === 'analyses' || stat.id === 'pending') ? <Loader2 className="h-5 w-5 animate-spin" /> : <stat.icon className={`h-5 w-5 ${stat.color}`} />}
                 </div>
             </CardHeader>
             <CardContent>
