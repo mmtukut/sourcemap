@@ -24,4 +24,7 @@ COPY . .
 EXPOSE 9000
 
 
-CMD ["sh", "-c", "python manage.py runserver 0.0.0.0:9000"]
+EXPOSE 9000
+
+
+CMD ["sh", "-c", "gunicorn sourcemap_project.wsgi:application --bind 0.0.0.0:9000 --workers 2 --timeout 120 --keep-alive 5 --max-requests 1000 --max-requests-jitter 100"]

@@ -169,20 +169,44 @@ REST_FRAMEWORK = {
 }
 
 
-# CORS settings (similar to FastAPI middleware)
-CORS_ALLOW_ALL_ORIGINS = True  # This is equivalent to allow_origins=["*"]
-# If you want more specific CORS settings, you can use:
-# CORS_ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost,http://127.0.0.1').split(',')
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "https://www.sourcemap.africa",
+    "http://localhost:3000",
+    "http://127.0.0.1:9002",
+]
+CORS_ALLOW_CREDENTIALS = True
 
 
 # drf-spectacular settings for API documentation
 SPECTACULAR_SETTINGS = {
     'TITLE': 'SourceMap Backend API',
-    'DESCRIPTION': 'Backend for SourceMap - Document Analysis and Verification Platform',
+    'DESCRIPTION': 'Backend for SourceMap - Document Analysis and Verification Platform with Historical Archive Verification',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
     'SCHEMA_PATH_PREFIX': '/api/v1',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'TAGS': [
+        {
+            'name': 'documents',
+            'description': 'Document upload, processing, and analysis operations'
+        },
+        {
+            'name': 'analysis',
+            'description': 'Document analysis and verification features'
+        },
+        {
+            'name': 'health',
+            'description': 'System health check operations'
+        },
+    ],
 }
 
 
@@ -199,11 +223,16 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001")
 
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+
 # Storage
 STORAGE_PATH = os.getenv("STORAGE_PATH", "./storage")
 
 # Processing
-MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", 50 * 1024 * 1024))  # 50MB in bytes
+MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", 20 * 1024 * 1024))  # 20MB in bytes
 SUPPORTED_FILE_TYPES = os.getenv("SUPPORTED_FILE_TYPES", "application/pdf,image/jpeg,image/png,image/jpg").split(",")
 
 # Provenance

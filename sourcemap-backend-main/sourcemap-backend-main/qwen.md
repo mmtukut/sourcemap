@@ -8,3 +8,5 @@ Strictly avoid the use of special characters (like ✓ and ✗) and Strictly avo
 
 
 I don't want you to run the development server, i am already running it in another terminal
+
+from now on you are meant to update your drf spectacular api documentation to match what the api does , please provide proper input and output structuring
