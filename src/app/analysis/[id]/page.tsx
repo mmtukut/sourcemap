@@ -14,41 +14,43 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { useParams } from 'next/navigation';
 import { API_BASE_URL } from '@/lib/api';
+import { SimilarArticles, type SimilarArticle } from '@/components/analysis/similar-articles';
 
-type EvidenceItem = {
-    type: string;
-    description: string;
-    severity: 'critical' | 'moderate' | 'consistent';
-    confidence: number;
+type SubScores = {
+  rag?: number;
+  vision?: number;
+  newsroom?: number;
 };
 
-type Metadata = {
-    filename: string;
-    size_bytes: number;
-    type: string;
-    pages?: number;
-    created?: string;
-    modified?: string;
-    author?: string;
-    creator_tool?: string;
-    producer?: string;
+type AnalysisResult = {
+  id: string;
+  confidence_score: number;
+  sub_scores: SubScores;
+  findings: string[];
+  created_at: string;
 };
 
 type BackendAnalysisResult = {
   document_id: string;
-  filename: string;
+  filename: string; // This is provided by the /documents/ endpoint, but not /analysis/. We'll handle it.
   status: string;
-  analysis_result?: {
-    id: string;
-    confidence_score: number;
-    assessment: string;
-    evidence: EvidenceItem[];
-    recommendations: string[];
-    created_at: string;
-  };
-  metadata?: Metadata;
+  analysis_result?: AnalysisResult;
+  similar_proven_newspapers?: SimilarArticle[];
   message?: string;
 };
+
+// Helper function to determine severity from finding text
+const getSeverity = (finding: string): 'critical' | 'moderate' | 'consistent' => {
+  const lowerFinding = finding.toLowerCase();
+  if (lowerFinding.includes('tampering') || lowerFinding.includes('questionable') || lowerFinding.includes('concerns')) {
+    return 'critical';
+  }
+  if (lowerFinding.includes('deviation') || lowerFinding.includes('matches')) {
+    return 'moderate';
+  }
+  return 'consistent';
+};
+
 
 export default function AnalysisResultPage() {
   const params = useParams();
@@ -76,10 +78,20 @@ export default function AnalysisResultPage() {
         const result: BackendAnalysisResult = await res.json();
         
         if (!result.analysis_result) {
-            throw new Error(result.message || "Analysis is not yet complete.");
+            // This could be a pending analysis, let's show progress.
+            const docRes = await fetch(`${API_BASE_URL}/documents/?document_id=${id}`);
+            if(docRes.ok) {
+                const docData = await docRes.json();
+                if(docData.length > 0) {
+                     setBackendData({ ...result, filename: docData[0].name });
+                }
+            }
+             // Let the UI handle the non-complete status
+             setBackendData(result);
+             // Polling could be implemented here
+        } else {
+             setBackendData(result);
         }
-        
-        setBackendData(result);
 
       } catch (e) {
          setError((e as Error).message || 'Failed to fetch analysis data.');
@@ -119,7 +131,7 @@ export default function AnalysisResultPage() {
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
         <h2 className="text-2xl font-semibold mb-2">Loading Analysis Report...</h2>
         <p className="text-muted-foreground max-w-md">
-            Retrieving the detailed findings for your document.
+            Retrieving the detailed findings for your document. This may take a moment.
         </p>
       </div>
     );
@@ -128,8 +140,11 @@ export default function AnalysisResultPage() {
   if (!backendData || !backendData.analysis_result) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center">
-          <h2 className="text-xl font-semibold text-destructive mb-2">Analysis Incomplete</h2>
-           <p className="text-muted-foreground mb-4">Could not retrieve complete analysis data from the server.</p>
+          <h2 className="text-xl font-semibold mb-2">Analysis In Progress...</h2>
+           <p className="text-muted-foreground mb-4">
+              The document analysis is still running. Status: <span className='font-bold'>{backendData?.status || 'loading'}</span>.
+              Please refresh in a moment.
+            </p>
            <Button asChild>
               <Link href="/dashboard">Return to Dashboard</Link>
            </Button>
@@ -137,29 +152,30 @@ export default function AnalysisResultPage() {
       );
   }
 
-
-  const { analysis_result, metadata, filename } = backendData;
-  const { confidence_score, evidence, recommendations } = analysis_result;
-  const score = confidence_score;
+  const { analysis_result, filename, similar_proven_newspapers } = backendData;
+  const { confidence_score, findings, sub_scores } = analysis_result;
+  const score = Math.round(confidence_score);
   const status = score >= 80 ? 'clear' : score >= 60 ? 'review' : 'flag';
 
-  const evidencePanelFindings = (evidence || []).map(item => ({
-    type: item.severity, 
-    description: item.description,
-    evidence: `Confidence: ${(item.confidence * 100).toFixed(0)}%`
+  const evidencePanelFindings = (findings || []).map(desc => ({
+    type: getSeverity(desc), 
+    description: desc,
+    evidence: `This finding was identified by the AI model.`
   }));
 
   const adaptedMetadata = {
-      filename: filename,
-      size: metadata?.size_bytes ? `${(metadata.size_bytes / 1024).toFixed(2)} KB` : 'N/A',
-      type: metadata?.type || 'N/A',
-      pages: metadata?.pages,
-      created: metadata?.created,
-      modified: metadata?.modified,
-      author: metadata?.author,
-      creatorTool: metadata?.creator_tool,
-      authenticityChecks: (evidence || []).map(e => e.description),
+      filename: filename || backendData.document_id,
+      size: 'N/A',
+      type: 'N/A',
+      authenticityChecks: (findings || []),
   };
+
+  // Recommendations are not in the backend response, so we provide a default or leave it empty.
+  const recommendations = [
+    "Verify the document's origin with the source directly if possible.",
+    "Cross-reference key names, dates, and figures with trusted public records.",
+    "For critical inconsistencies, consult with a forensic document expert."
+  ];
 
   return (
     <div className="space-y-8">
@@ -171,11 +187,11 @@ export default function AnalysisResultPage() {
           </Link>
         </Button>
         <h1 className="text-3xl font-bold font-headline tracking-tight mt-2">
-          Analysis for: {filename || 'document'}
+          Analysis for: {filename || backendData.document_id}
         </h1>
       </div>
 
-      <ConfidenceScore score={score} status={status} />
+      <ConfidenceScore score={score} status={status} subScores={sub_scores} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
         <div className="lg:col-span-3">
@@ -186,10 +202,16 @@ export default function AnalysisResultPage() {
         </div>
       </div>
       
+      <div className="space-y-8">
+         {similar_proven_newspapers && similar_proven_newspapers.length > 0 && (
+            <SimilarArticles articles={similar_proven_newspapers} />
+        )}
+      </div>
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <AnalysisTabs metadataAnalysis={adaptedMetadata} similarDocuments={[]} />
         <div className="space-y-8">
-            <Recommendations recommendations={recommendations || []} />
+            <Recommendations recommendations={recommendations} />
             <Feedback />
         </div>
       </div>

@@ -25,13 +25,13 @@ import type { AutomatedDocumentAnalysisOutput } from '@/ai/flows/automated-docum
 import { useEffect, useState } from 'react';
 
 type AnalysisTabsProps = {
-  metadataAnalysis: AutomatedDocumentAnalysisOutput['metadataAnalysis'];
+  metadataAnalysis: Omit<AutomatedDocumentAnalysisOutput['metadataAnalysis'], 'similarDocuments'>;
   similarDocuments: AutomatedDocumentAnalysisOutput['similarDocuments'];
 };
 
 export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTabsProps) {
-  const [createdDate, setCreatedDate] = useState('');
-  const [modifiedDate, setModifiedDate] = useState('');
+  const [createdDate, setCreatedDate] = useState('N/A');
+  const [modifiedDate, setModifiedDate] = useState('N/A');
 
   useEffect(() => {
     if (metadataAnalysis.created) {
@@ -46,7 +46,10 @@ export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTab
     <Tabs defaultValue="metadata">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="metadata">Metadata</TabsTrigger>
-        <TabsTrigger value="similar">Similar Docs</TabsTrigger>
+        <TabsTrigger value="similar">
+            Similar Docs
+            {similarDocuments.length > 0 && <Badge className="ml-2">{similarDocuments.length}</Badge>}
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="metadata">
         <Card>
@@ -63,7 +66,7 @@ export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTab
                 <p>Filename: <span className="text-muted-foreground">{metadataAnalysis.filename}</span></p>
                 <p>Size: <span className="text-muted-foreground">{metadataAnalysis.size}</span></p>
                 <p>Type: <span className="text-muted-foreground">{metadataAnalysis.type}</span></p>
-                <p>Pages: <span className="text-muted-foreground">{metadataAnalysis.pages}</span></p>
+                <p>Pages: <span className="text-muted-foreground">{metadataAnalysis.pages || 'N/A'}</span></p>
               </div>
             </div>
              <div className="space-y-2">
@@ -71,20 +74,24 @@ export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTab
               <div className="rounded-lg border p-4 grid grid-cols-2 gap-4 text-sm font-mono">
                 <p>Created: <span className="text-muted-foreground">{createdDate}</span></p>
                 <p>Modified: <span className="text-muted-foreground">{modifiedDate}</span></p>
-                <p>Author: <span className="text-muted-foreground">{metadataAnalysis.author}</span></p>
-                <p>Creator Tool: <span className="text-muted-foreground">{metadataAnalysis.creatorTool}</span></p>
+                <p>Author: <span className="text-muted-foreground">{metadataAnalysis.author || 'N/A'}</span></p>
+                <p>Creator Tool: <span className="text-muted-foreground">{metadataAnalysis.creatorTool || 'N/A'}</span></p>
               </div>
             </div>
              <div className="space-y-2">
               <h3 className="font-semibold">Authenticity Checks</h3>
-              <ul className="space-y-2">
-                {metadataAnalysis.authenticityChecks.map((check, index) => (
-                    <li key={index} className="flex items-center gap-2 text-sm">
-                        {check.includes('Modified after') ? <AlertTriangle className="h-4 w-4 text-yellow-500" /> : <CheckCircle className="h-4 w-4 text-green-500" />}
-                        <span>{check}</span>
-                    </li>
-                ))}
-              </ul>
+               {metadataAnalysis.authenticityChecks.length > 0 ? (
+                  <ul className="space-y-2">
+                    {metadataAnalysis.authenticityChecks.map((check, index) => (
+                        <li key={index} className="flex items-center gap-2 text-sm">
+                            {check.includes('Modified after') ? <AlertTriangle className="h-4 w-4 text-yellow-500" /> : <CheckCircle className="h-4 w-4 text-green-500" />}
+                            <span>{check}</span>
+                        </li>
+                    ))}
+                  </ul>
+               ): (
+                <p className="text-sm text-muted-foreground">No specific authenticity checks were reported in the findings.</p>
+               )}
             </div>
             <Button variant="outline">
               <FileJson className="mr-2 h-4 w-4" />
@@ -102,25 +109,31 @@ export function AnalysisTabs({ metadataAnalysis, similarDocuments }: AnalysisTab
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {similarDocuments.map((doc, index) => (
-                <Card key={index}>
-                    <CardHeader>
-                        <CardTitle className="text-base">{doc.filename}</CardTitle>
-                        <div className="flex items-center gap-4 text-sm">
-                            <p>Similarity: <Badge variant={doc.similarity > 80 ? 'default' : 'secondary'}>{doc.similarity}%</Badge></p>
-                            <p>Status: <Badge variant="outline" className='border-green-300 bg-green-50 text-green-800'>{doc.status}</Badge></p>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <h4 className="font-semibold text-sm mb-2">Key Differences:</h4>
-                        <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-                            {doc.keyDifferences.map((diff, i) => <li key={i}>{diff}</li>)}
-                        </ul>
-                         <h4 className="font-semibold text-sm mt-4 mb-2">Assessment:</h4>
-                         <p className="text-sm text-muted-foreground">{doc.assessment}</p>
-                    </CardContent>
-                </Card>
-            ))}
+             {similarDocuments.length > 0 ? (
+                similarDocuments.map((doc, index) => (
+                    <Card key={index}>
+                        <CardHeader>
+                            <CardTitle className="text-base">{doc.filename}</CardTitle>
+                            <div className="flex items-center gap-4 text-sm">
+                                <p>Similarity: <Badge variant={doc.similarity > 80 ? 'default' : 'secondary'}>{doc.similarity}%</Badge></p>
+                                <p>Status: <Badge variant="outline" className='border-green-300 bg-green-50 text-green-800'>{doc.status}</Badge></p>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <h4 className="font-semibold text-sm mb-2">Key Differences:</h4>
+                            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
+                                {doc.keyDifferences.map((diff, i) => <li key={i}>{diff}</li>)}
+                            </ul>
+                            <h4 className="font-semibold text-sm mt-4 mb-2">Assessment:</h4>
+                            <p className="text-sm text-muted-foreground">{doc.assessment}</p>
+                        </CardContent>
+                    </Card>
+                ))
+            ) : (
+                <div className="text-center text-muted-foreground p-8">
+                    <p>No similar documents were found in the knowledge base for comparison.</p>
+                </div>
+            )}
           </CardContent>
         </Card>
       </TabsContent>

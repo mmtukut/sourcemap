@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Accordion,
   AccordionContent,
@@ -11,7 +11,7 @@ import {
   XCircle,
   ChevronsRight,
 } from 'lucide-react';
-import { AutomatedDocumentAnalysisOutput } from '@/ai/flows/automated-document-analysis';
+import type { AutomatedDocumentAnalysisOutput } from '@/ai/flows/automated-document-analysis';
 
 type EvidencePanelProps = {
   keyFindings: AutomatedDocumentAnalysisOutput['keyFindings'];
@@ -46,39 +46,48 @@ export function EvidencePanel({ keyFindings }: EvidencePanelProps) {
     <Card className="shadow-xl rounded-2xl">
       <CardHeader>
         <CardTitle>Evidence Summary</CardTitle>
-        <p className="text-muted-foreground">
-          {criticalCount} critical and {moderateCount} moderate issues found.
-        </p>
+        <CardDescription>
+          {criticalCount > 0 || moderateCount > 0
+            ? `${criticalCount} critical and ${moderateCount} moderate issues found.`
+            : 'No significant issues found.'}
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <Accordion type="single" collapsible className="w-full">
-          {keyFindings.map((finding, index) => {
-            const config = findingConfig[finding.type];
-            const Icon = config.icon;
-            return (
-              <AccordionItem value={`item-${index}`} key={index}>
-                <AccordionTrigger
-                  className={`rounded-lg px-4 text-left font-semibold hover:no-underline ${config.bgColor} border-l-4 ${config.borderColor}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-5 w-5 flex-shrink-0 ${config.color}`} />
-                    <span>{finding.description}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="p-4 text-sm text-muted-foreground">
-                    {finding.evidence ? (
-                        <p>{finding.evidence}</p>
-                    ) : (
-                        <p>This aspect of the document is consistent with expectations.</p>
-                    )}
-                  <button className="mt-2 flex items-center text-sm font-semibold text-primary hover:underline">
-                    Explain Why <ChevronsRight className="ml-1 h-4 w-4" />
-                  </button>
-                </AccordionContent>
-              </AccordionItem>
-            );
-          })}
-        </Accordion>
+        {keyFindings.length > 0 ? (
+          <Accordion type="single" collapsible className="w-full">
+            {keyFindings.map((finding, index) => {
+              const config = findingConfig[finding.type];
+              const Icon = config.icon;
+              return (
+                <AccordionItem value={`item-${index}`} key={index}>
+                  <AccordionTrigger
+                    className={`rounded-lg px-4 text-left font-semibold hover:no-underline ${config.bgColor} border-l-4 ${config.borderColor}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={`h-5 w-5 flex-shrink-0 ${config.color}`} />
+                      <span className="truncate">{finding.description}</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-4 text-sm text-muted-foreground">
+                      {finding.evidence ? (
+                          <p>{finding.evidence}</p>
+                      ) : (
+                          <p>This aspect of the document appears to be consistent with expectations.</p>
+                      )}
+                    <button className="mt-2 flex items-center text-sm font-semibold text-primary hover:underline">
+                      Explain Why <ChevronsRight className="ml-1 h-4 w-4" />
+                    </button>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        ) : (
+          <div className="text-center text-muted-foreground p-4">
+            <CheckCircle2 className="mx-auto h-8 w-8 text-green-500 mb-2" />
+            <p>The analysis did not flag any specific pieces of evidence as inconsistent or tampered.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
